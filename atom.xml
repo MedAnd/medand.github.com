@@ -125,9 +125,9 @@
     </summary>
     
     
-      <category term="Asp.Net" scheme="http://yoursite.com/tags/Asp-Net/"/>
-    
       <category term="Azure" scheme="http://yoursite.com/tags/Azure/"/>
+    
+      <category term="Asp.Net" scheme="http://yoursite.com/tags/Asp-Net/"/>
     
   </entry>
   
