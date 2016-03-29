@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Asp.Net Core bug within AuthenticationFailed middleware on redirect - Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such ch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Asp.Net Core bug within AuthenticationFailed middleware on redirect">
+<meta property="og:url" content="http://yoursite.com/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such ch">
+<meta property="og:updated_time" content="2016-03-29T01:39:13.275Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Asp.Net Core bug within AuthenticationFailed middleware on redirect">
+<meta name="twitter:description" content="Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such ch">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Asp.Net Core bug within AuthenticationFailed middleware on redirect
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/" class="article-date">
+  <time datetime="2016-03-28T13:00:00.000Z" itemprop="datePublished">2016-03-29</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such challenge I had recently while working on a brand new Asp.Net Core MVC 6 solution, integrated with Azure AD and OpenID Connect was an Asp.Net Core RC1 bug which did not allow redirects in middleware on AuthenticationFailed.</p>
+<p>Firing up the debugger we can see that a new instance of AuthenticationProperties will do the trick, allow for the redirect to occur. The workaround looks something like:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> Task <span class="title">AuthenticationFailed</span>(<span class="params">AuthenticationFailedContext context</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (context.AuthenticationTicket == <span class="keyword">null</span>)</span><br><span class="line">	&#123;            </span><br><span class="line">		<span class="comment">// The following is a workaround for a bug in RC1 which does not allow redirect within auth middleware</span></span><br><span class="line">		AuthenticationProperties authProperties = <span class="keyword">new</span> AuthenticationProperties</span><br><span class="line">		&#123;</span><br><span class="line">			IsPersistent = <span class="keyword">false</span>,</span><br><span class="line">			RedirectUri = (<span class="string">"/Home/Error?message=1"</span>)</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		context.HandleResponse();</span><br><span class="line">		context.AuthenticationTicket = <span class="keyword">new</span> AuthenticationTicket(context.HttpContext.User, authProperties, context.Options.AuthenticationScheme);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> Task.FromResult(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net-Core/">Asp.Net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MVC-6/">MVC 6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Security/">Security</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"> Continuous integration &amp; deployment of Azure Web Roles using TFS on-premise and WebDeploy Part 1&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

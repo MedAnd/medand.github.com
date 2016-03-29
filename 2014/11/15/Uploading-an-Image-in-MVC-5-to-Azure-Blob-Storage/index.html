@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title> Uploading an Image in MVC 5 to Azure Blob Storage - Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="An interesting customer requirement last week came up where I needed to upload an image in MVC 5 directly to Azure Blob Storage. A simplified version follows, removing some application specific logic">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" Uploading an Image in MVC 5 to Azure Blob Storage">
+<meta property="og:url" content="http://yoursite.com/2014/11/15/Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="An interesting customer requirement last week came up where I needed to upload an image in MVC 5 directly to Azure Blob Storage. A simplified version follows, removing some application specific logic">
+<meta property="og:updated_time" content="2016-03-29T02:27:25.464Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content=" Uploading an Image in MVC 5 to Azure Blob Storage">
+<meta name="twitter:description" content="An interesting customer requirement last week came up where I needed to upload an image in MVC 5 directly to Azure Blob Storage. A simplified version follows, removing some application specific logic">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+       Uploading an Image in MVC 5 to Azure Blob Storage
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/11/15/Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage/" class="article-date">
+  <time datetime="2014-11-14T13:00:00.000Z" itemprop="datePublished">2014-11-15</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>An interesting customer requirement last week came up where I needed to upload an image in MVC 5 directly to Azure Blob Storage. A simplified version follows, removing some application specific logic and validation steps. To start off I first created a MVC model for image upload purposes.</p>
+<p>ImageUploadBindingModel</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ImageUploadBindingModel</span></span><br><span class="line">&#123;</span><br><span class="line">    [MaxFileSize(<span class="number">1000000</span>, ErrorMessage = <span class="string">"Maximum allowed file size is 1MB"</span>)]</span><br><span class="line">    [DataType(DataType.Upload)]</span><br><span class="line">    <span class="keyword">public</span> HttpPostedFileBase DisplayImageUpload &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>For additional validation control over the upload, create a custom ValidationAttribute called MaxFileSizeAttribute.</p>
+<p>MaxFileSizeAttribute</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">public class MaxFileSizeAttribute : ValidationAttribute, IClientValidatable</span><br><span class="line">&#123;</span><br><span class="line">    private readonly int _maxFileSize;</span><br><span class="line">    </span><br><span class="line">    public MaxFileSizeAttribute(int maxFileSize)</span><br><span class="line">    &#123;</span><br><span class="line">        _maxFileSize = maxFileSize;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public override bool IsValid(object value)</span><br><span class="line">    &#123;</span><br><span class="line">        var file = value as HttpPostedFileBase;</span><br><span class="line">        if (file == null)</span><br><span class="line">        &#123;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">        return file.ContentLength &lt;= _maxFileSize;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public override string FormatErrorMessage(string name)</span><br><span class="line">    &#123;</span><br><span class="line">        return base.FormatErrorMessage(_maxFileSize.ToString());</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public IEnumerable GetClientValidationRules(ModelMetadata metadata, ControllerContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        var rule = new ModelClientValidationRule</span><br><span class="line">        &#123;</span><br><span class="line">            ErrorMessage = FormatErrorMessage(_maxFileSize.ToString()),</span><br><span class="line">            ValidationType = "filesize"</span><br><span class="line">        &#125;;</span><br><span class="line"> </span><br><span class="line">        rule.ValidationParameters["maxsize"] = _maxFileSize;</span><br><span class="line">        yield return rule;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now let’s turn our attention to the actual Azure logic which streams the upload direct from MVC memory to Azure Blob Storage. Note that CloudConfigurationManager is used to source relevant connection information required by the Azure libraries, something I hope to cover in another post as it’s a very relevant topic for Cloud first .Net solutions.</p>
+<p>AzureStorage.cs</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure;</span><br><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure.Storage;</span><br><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure.Storage.Auth;</span><br><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure.Storage.Blob;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Contoso.Helpers</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AzureStorage</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">UploadFromStream</span>(<span class="params"><span class="keyword">string</span> uniqueBlobName, <span class="keyword">string</span> blobContentType, Stream fileStream</span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            <span class="comment">// Retrieve storage account from connection string</span></span><br><span class="line">            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting(<span class="string">"StorageConnection"</span>));</span><br><span class="line">            <span class="comment">// Create the blob client</span></span><br><span class="line">            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();</span><br><span class="line">            <span class="comment">// Retrieve reference to a previously created container</span></span><br><span class="line">            CloudBlobContainer container = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting(<span class="string">"StorageContainer"</span>));</span><br><span class="line">            <span class="comment">// Retrieve reference to a blob</span></span><br><span class="line">            CloudBlockBlob blockBlob = container.GetBlockBlobReference(uniqueBlobName);</span><br><span class="line">            <span class="comment">// Set Blob ContentType</span></span><br><span class="line">            blockBlob.Properties.ContentType = blobContentType;</span><br><span class="line">            <span class="comment">// Stream fileStream to Blob - Note: Overwrites any existing file</span></span><br><span class="line">            blockBlob.UploadFromStream(fileStream);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Lastly the Controller handling the upload.</p>
+<p>UploadImage</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">async</span> Task <span class="title">UploadImage</span>(<span class="params">ImageUploadBindingModel model</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">    ContosoIdentityUser user = <span class="keyword">await</span> UserManager.FindByIdAsync(User.Identity.GetUserId());</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (user == <span class="keyword">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">             </span><br><span class="line">    <span class="keyword">if</span> (!ModelState.IsValid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> BadRequest(ModelState);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">var</span> validImageTypes = <span class="keyword">new</span> <span class="keyword">string</span>[]</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">"image/gif"</span>,</span><br><span class="line">        <span class="string">"image/jpeg"</span>,</span><br><span class="line">        <span class="string">"image/pjpeg"</span>,</span><br><span class="line">        <span class="string">"image/png"</span></span><br><span class="line">    &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (model.DisplayImageUpload != <span class="keyword">null</span> &amp;&amp; model.DisplayImageUpload.ContentLength &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (!validImageTypes.Contains(model.DisplayImageUpload.ContentType))</span><br><span class="line">        &#123;</span><br><span class="line">            ModelState.AddModelError(<span class="string">"DisplayImageUpload"</span>, <span class="string">"Supported Display Image formats: GIF, JPG or PNG."</span>);</span><br><span class="line">            <span class="keyword">return</span> BadRequest(ModelState);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (model.DisplayImageUpload != <span class="keyword">null</span> &amp;&amp; model.DisplayImageUpload.ContentLength &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">string</span> uniqueBlobName = <span class="keyword">string</span>.Format(<span class="string">"Image_&#123;0&#125;.&#123;1&#125;"</span>, user.Id, Path.GetExtension(model.DisplayImageUpload.FileName));</span><br><span class="line">        <span class="keyword">string</span> blobContentType = model.DisplayImageUpload.ContentType;</span><br><span class="line"> </span><br><span class="line">        AzureStorage.UploadFromStream(uniqueBlobName, blobContentType, model.DisplayImageUpload.InputStream);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> Ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net/">Asp.Net</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Azure/">Azure</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+           SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/10/31/Extending-Asp-Net-Identity-2-0-with-custom-fields/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Extending Asp.Net Identity 2.0 with custom fields&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

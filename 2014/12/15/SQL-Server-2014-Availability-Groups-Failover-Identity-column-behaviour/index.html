@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour - Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a cou">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" SQL Server 2014 Availability Groups, Failover & Identity column behaviour">
+<meta property="og:url" content="http://yoursite.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a cou">
+<meta property="og:updated_time" content="2016-03-29T02:30:03.632Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content=" SQL Server 2014 Availability Groups, Failover & Identity column behaviour">
+<meta name="twitter:description" content="Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a cou">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+       SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/" class="article-date">
+  <time datetime="2014-12-14T13:00:00.000Z" itemprop="datePublished">2014-12-15</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.</p>
+<p>According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”</p>
+<p>Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”</p>
+<p>For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: <strong>-t272.</strong> </p>
+<p>The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. </p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL-Server/">SQL Server</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+           Continuous integration &amp; deployment of Azure Web Roles using TFS on-premise and WebDeploy Part 1
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/11/15/Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"> Uploading an Image in MVC 5 to Azure Blob Storage&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

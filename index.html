@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+<meta name="twitter:description">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer">
+      <article id="post-Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/">Asp.Net Core bug within AuthenticationFailed middleware on redirect</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/" class="article-date">
+  <time datetime="2016-03-28T13:00:00.000Z" itemprop="datePublished">2016-03-29</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such challenge I had recently while working on a brand new Asp.Net Core MVC 6 solution, integrated with Azure AD and OpenID Connect was an Asp.Net Core RC1 bug which did not allow redirects in middleware on AuthenticationFailed.</p>
+<p>Firing up the debugger we can see that a new instance of AuthenticationProperties will do the trick, allow for the redirect to occur. The workaround looks something like:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> Task <span class="title">AuthenticationFailed</span>(<span class="params">AuthenticationFailedContext context</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (context.AuthenticationTicket == <span class="keyword">null</span>)</span><br><span class="line">	&#123;            </span><br><span class="line">		<span class="comment">// The following is a workaround for a bug in RC1 which does not allow redirect within auth middleware</span></span><br><span class="line">		AuthenticationProperties authProperties = <span class="keyword">new</span> AuthenticationProperties</span><br><span class="line">		&#123;</span><br><span class="line">			IsPersistent = <span class="keyword">false</span>,</span><br><span class="line">			RedirectUri = (<span class="string">"/Home/Error?message=1"</span>)</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		context.HandleResponse();</span><br><span class="line">		context.AuthenticationTicket = <span class="keyword">new</span> AuthenticationTicket(context.HttpContext.User, authProperties, context.Options.AuthenticationScheme);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> Task.FromResult(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net-Core/">Asp.Net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MVC-6/">MVC 6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Security/">Security</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
+      <article id="post-Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/"> Continuous integration &amp; deployment of Azure Web Roles using TFS on-premise and WebDeploy Part 1</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/" class="article-date">
+  <time datetime="2014-12-14T13:00:00.000Z" itemprop="datePublished">2014-12-15</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Much work has gone into making continuous integration &amp; deployment of Azure Websites as simple and low friction as possible with support for Visual Studio Online, Git and BitBucket etc. For customers and teams still using TFS on-premise and working with Web Roles (Azure Cloud Services) the experience is a little more involved with many resorting to rolling their own solutions, TFS Build Templates and PowerShell scripts, if tools like Octopus Deploy and platforms like appveyor are beyond reach.</p>
+<blockquote><p>Before we proceed a small caveat, in part one we’ll look at automating just the deployment of files and code which have changed. This should suffice for most single instance Dev and Test scenarios, where code is compiled and deployed on hourly, daily cycles. For Production you will also want to deploy the .cspkg file in case Azure reprovisions your Web Role instance(s).</p>
+</blockquote>
+<p>I’ll assume you already have knowledge of the TFS build process, in addition to having source and build TFS server environments configured, I’ll skip straight to the MSBuild parameters as this is where most of the magic happens. I’ll also assume you have the latest Azure SDK and Visual Studio files installed on your build server. By VS files I mean the files required by the BuildProcessTemplate, in my case a customised version of the DefaultTemplate.11.xaml. </p>
+<p>PowerShell scripts could be used for the Cloud Service provisioning step however for simplicity I’ve opted for a manual step where I use the Microsoft Azure Publish Settings wizard in VS 2013 and do an initial once off deployment of my Web Role to Azure, making sure to enable Remote Desktop for all roles and Enable Web Deploy for all Web Roles. You will need to take note of the username and password created during this process as they are used later as MSBuild arguments.</p>
+<p>Once you have successfully Published your Web Role to an Azure Staging Slot, you will need to repeat the process for the Production Slot, so that we can use the Swap Deployment Slots feature (endpoints have to match) once our tests have passed.</p>
+<p>To create a new Dev build definition in Team Explorer I select my preferred Source Setting, Build Defaults, Trigger values, Build Template etc. Note in the MSBuild arguments below UserName and Password are values you defined when using the Microsoft Azure Publish Settings wizard in VS 2013. Moreover I am targeting a Debug build, specifying the VisualStudioVersion which for VS 2013 happens to be 12.0. The MsDeployServiceUrl will always be in the form <a href="https://xyz.cloudapp.net:8172/MSDeploy.axd" target="_blank" rel="external">https://xyz.cloudapp.net:8172/MSDeploy.axd</a> where xyz is either your Cloud Service name or the ID Azure generates for your Staging Web Role.</p>
+<p>If you are unsure what this value needs to be go to Server Explorer and drill down the Azure Cloud Services until you find your Staging environment. Selecting the Staging node right click Properties: you will see the value for Name is in the form of a GUID. Use this value and replace xyz. To find your DeployIisAppPath value expand the Staging Node, expand the Web Role and select Instance 0, right click Properties: you will see a Name value in the form Contoso.Web_IN_0. Use this value as your DeployIisAppPath.</p>
+<p>So putting it all together, your MSBuild arguments should look something like the following:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/P:VisualStudioVersion=12.0 </span><br><span class="line">/P:Configuration=Debug </span><br><span class="line">/P:DeployOnBuild=True </span><br><span class="line">/P:DeployTarget=MSDeployPublish </span><br><span class="line">/P:MsDeployServiceUrl=<span class="string">"https://8f5c8aa194524f18bd2697675025fdab.cloudapp.net:8172/MSDeploy.axd"</span></span><br><span class="line">/P:DeployIisAppPath=<span class="string">"Contoso.Web_IN_0_Web"</span> </span><br><span class="line">/P:AllowUntrustedCertificate=True </span><br><span class="line">/P:MSDeployPublishMethod=WMsvc </span><br><span class="line">/P:CreatePackageOnPublish=True </span><br><span class="line">/P:UserName=<span class="string">"contosomasteruser"</span> </span><br><span class="line">/P:Password=<span class="string">"YourPasswordGoesHere"</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Azure/">Azure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DevOps/">DevOps</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
+      <article id="post-SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/" class="article-date">
+  <time datetime="2014-12-14T13:00:00.000Z" itemprop="datePublished">2014-12-15</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.</p>
+<p>According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”</p>
+<p>Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”</p>
+<p>For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: <strong>-t272.</strong> </p>
+<p>The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. </p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL-Server/">SQL Server</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
+      <article id="post-Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/11/15/Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage/"> Uploading an Image in MVC 5 to Azure Blob Storage</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/11/15/Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage/" class="article-date">
+  <time datetime="2014-11-14T13:00:00.000Z" itemprop="datePublished">2014-11-15</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>An interesting customer requirement last week came up where I needed to upload an image in MVC 5 directly to Azure Blob Storage. A simplified version follows, removing some application specific logic and validation steps. To start off I first created a MVC model for image upload purposes.</p>
+<p>ImageUploadBindingModel</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ImageUploadBindingModel</span></span><br><span class="line">&#123;</span><br><span class="line">    [MaxFileSize(<span class="number">1000000</span>, ErrorMessage = <span class="string">"Maximum allowed file size is 1MB"</span>)]</span><br><span class="line">    [DataType(DataType.Upload)]</span><br><span class="line">    <span class="keyword">public</span> HttpPostedFileBase DisplayImageUpload &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>For additional validation control over the upload, create a custom ValidationAttribute called MaxFileSizeAttribute.</p>
+<p>MaxFileSizeAttribute</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">public class MaxFileSizeAttribute : ValidationAttribute, IClientValidatable</span><br><span class="line">&#123;</span><br><span class="line">    private readonly int _maxFileSize;</span><br><span class="line">    </span><br><span class="line">    public MaxFileSizeAttribute(int maxFileSize)</span><br><span class="line">    &#123;</span><br><span class="line">        _maxFileSize = maxFileSize;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public override bool IsValid(object value)</span><br><span class="line">    &#123;</span><br><span class="line">        var file = value as HttpPostedFileBase;</span><br><span class="line">        if (file == null)</span><br><span class="line">        &#123;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">        return file.ContentLength &lt;= _maxFileSize;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public override string FormatErrorMessage(string name)</span><br><span class="line">    &#123;</span><br><span class="line">        return base.FormatErrorMessage(_maxFileSize.ToString());</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public IEnumerable GetClientValidationRules(ModelMetadata metadata, ControllerContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        var rule = new ModelClientValidationRule</span><br><span class="line">        &#123;</span><br><span class="line">            ErrorMessage = FormatErrorMessage(_maxFileSize.ToString()),</span><br><span class="line">            ValidationType = "filesize"</span><br><span class="line">        &#125;;</span><br><span class="line"> </span><br><span class="line">        rule.ValidationParameters["maxsize"] = _maxFileSize;</span><br><span class="line">        yield return rule;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now let’s turn our attention to the actual Azure logic which streams the upload direct from MVC memory to Azure Blob Storage. Note that CloudConfigurationManager is used to source relevant connection information required by the Azure libraries, something I hope to cover in another post as it’s a very relevant topic for Cloud first .Net solutions.</p>
+<p>AzureStorage.cs</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure;</span><br><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure.Storage;</span><br><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure.Storage.Auth;</span><br><span class="line"><span class="keyword">using</span> Microsoft.WindowsAzure.Storage.Blob;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Contoso.Helpers</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AzureStorage</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">UploadFromStream</span>(<span class="params"><span class="keyword">string</span> uniqueBlobName, <span class="keyword">string</span> blobContentType, Stream fileStream</span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            <span class="comment">// Retrieve storage account from connection string</span></span><br><span class="line">            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting(<span class="string">"StorageConnection"</span>));</span><br><span class="line">            <span class="comment">// Create the blob client</span></span><br><span class="line">            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();</span><br><span class="line">            <span class="comment">// Retrieve reference to a previously created container</span></span><br><span class="line">            CloudBlobContainer container = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting(<span class="string">"StorageContainer"</span>));</span><br><span class="line">            <span class="comment">// Retrieve reference to a blob</span></span><br><span class="line">            CloudBlockBlob blockBlob = container.GetBlockBlobReference(uniqueBlobName);</span><br><span class="line">            <span class="comment">// Set Blob ContentType</span></span><br><span class="line">            blockBlob.Properties.ContentType = blobContentType;</span><br><span class="line">            <span class="comment">// Stream fileStream to Blob - Note: Overwrites any existing file</span></span><br><span class="line">            blockBlob.UploadFromStream(fileStream);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Lastly the Controller handling the upload.</p>
+<p>UploadImage</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">async</span> Task <span class="title">UploadImage</span>(<span class="params">ImageUploadBindingModel model</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">    ContosoIdentityUser user = <span class="keyword">await</span> UserManager.FindByIdAsync(User.Identity.GetUserId());</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (user == <span class="keyword">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">             </span><br><span class="line">    <span class="keyword">if</span> (!ModelState.IsValid)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> BadRequest(ModelState);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">var</span> validImageTypes = <span class="keyword">new</span> <span class="keyword">string</span>[]</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">"image/gif"</span>,</span><br><span class="line">        <span class="string">"image/jpeg"</span>,</span><br><span class="line">        <span class="string">"image/pjpeg"</span>,</span><br><span class="line">        <span class="string">"image/png"</span></span><br><span class="line">    &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (model.DisplayImageUpload != <span class="keyword">null</span> &amp;&amp; model.DisplayImageUpload.ContentLength &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (!validImageTypes.Contains(model.DisplayImageUpload.ContentType))</span><br><span class="line">        &#123;</span><br><span class="line">            ModelState.AddModelError(<span class="string">"DisplayImageUpload"</span>, <span class="string">"Supported Display Image formats: GIF, JPG or PNG."</span>);</span><br><span class="line">            <span class="keyword">return</span> BadRequest(ModelState);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (model.DisplayImageUpload != <span class="keyword">null</span> &amp;&amp; model.DisplayImageUpload.ContentLength &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">string</span> uniqueBlobName = <span class="keyword">string</span>.Format(<span class="string">"Image_&#123;0&#125;.&#123;1&#125;"</span>, user.Id, Path.GetExtension(model.DisplayImageUpload.FileName));</span><br><span class="line">        <span class="keyword">string</span> blobContentType = model.DisplayImageUpload.ContentType;</span><br><span class="line"> </span><br><span class="line">        AzureStorage.UploadFromStream(uniqueBlobName, blobContentType, model.DisplayImageUpload.InputStream);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> Ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net/">Asp.Net</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Azure/">Azure</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
+      <article id="post-Extending-Asp-Net-Identity-2-0-with-custom-fields" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/10/31/Extending-Asp-Net-Identity-2-0-with-custom-fields/">Extending Asp.Net Identity 2.0 with custom fields</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/10/31/Extending-Asp-Net-Identity-2-0-with-custom-fields/" class="article-date">
+  <time datetime="2014-10-30T13:00:00.000Z" itemprop="datePublished">2014-10-31</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Recently I needed a quick and low friction way of extending Asp.Net Identity 2.0, tying into the Entity Framework 6 way of working with custom fields and table mappings. To accomplish this first create something similar to a new ContosoIdentityUser which inherits from IdentityUser.</p>
+<p>ContosoIdentityUser.cs</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.AspNet.Identity.EntityFramework;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Contoso.Web</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ContosoIdentityUser</span> : <span class="title">IdentityUser</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> FirstName &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> LastName &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">public</span> DateTime DOB &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> AddressLine1 &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> AddressLine2 &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> Suburb &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> State &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> Postcode &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;    </span><br></pre></td></tr></table></figure>
+<p>We then likewise create a new ContosoIdentityDbContext which inherits from IdentityDbContext.</p>
+<p>ContosoIdentityDbContext.cs</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Data.Entity;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Web;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> Microsoft.AspNet.Identity.EntityFramework;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Contoso.Web</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ContosoIdentityDbContext</span> : <span class="title">IdentityDbContext</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">ContosoIdentityDbContext</span>(<span class="params"></span>)</span><br><span class="line">            : <span class="title">base</span>(<span class="params"><span class="string">"DefaultConnection"</span></span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnModelCreating</span>(<span class="params">DbModelBuilder modelBuilder</span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (modelBuilder == <span class="keyword">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"modelBuilder"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            SetIdentityUserModel(modelBuilder);</span><br><span class="line">            <span class="keyword">base</span>.OnModelCreating(modelBuilder);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">SetIdentityUserModel</span>(<span class="params">DbModelBuilder modelBuilder</span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.FirstName).HasMaxLength(<span class="number">50</span>).IsRequired();</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.LastName).HasMaxLength(<span class="number">50</span>).IsRequired();</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.DOB).IsRequired();</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.AddressLine1).HasMaxLength(<span class="number">100</span>).IsRequired();</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.AddressLine2).HasMaxLength(<span class="number">100</span>).IsOptional();</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.Suburb).HasMaxLength(<span class="number">50</span>).IsRequired();</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.State).HasMaxLength(<span class="number">3</span>).IsRequired();</span><br><span class="line">            modelBuilder.Entity().Property(x =&gt; x.Postcode).HasMaxLength(<span class="number">4</span>).IsRequired();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+<p>Now to stitch it all together in your boot strapper logic, in my case this is within Startup(), just wire up to our newly created extensions:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> userManager = <span class="keyword">new</span> UserManager(<span class="keyword">new</span> UserStore(<span class="keyword">new</span> ContosoIdentityDbContext()));</span><br><span class="line">UserManagerFactory = () =&gt; userManager;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net/">Asp.Net</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Security/">Security</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
