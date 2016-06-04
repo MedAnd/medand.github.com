@@ -50,11 +50,11 @@
   </entry>
   
   <entry>
-    <title>Asp.Net Core MVC 6, OpenIdConnect, JWT and Angular 2 SPA (Startup.cs)</title>
+    <title>Asp.Net Core MVC 6, OpenIdConnect, JWT and Angular 2 SPA - Part 1</title>
     <link href="http://www.medic-consulting.com/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/"/>
     <id>http://www.medic-consulting.com/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/</id>
     <published>2016-03-28T13:00:00.000Z</published>
-    <updated>2016-06-04T14:34:00.162Z</updated>
+    <updated>2016-06-04T14:59:18.171Z</updated>
     
     <content type="html">&lt;p&gt; Working with Asp.Net Core and Angular 2 at the time of writing may feel like a trail blazing experience, especially given the lack of documentation and stability in the underling frameworks, libraries and tools, leading to lost time in debugging and searching for answers.&lt;br&gt;In the hope of documenting some of my own recent experiences integrating these technologies and Microsoft’s micro-services framework &lt;a href=&quot;https://azure.microsoft.com/en-us/services/service-fabric/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Service Fabric&lt;/a&gt;, I’ll dive into specific code areas which have proven fiddley. To start off I should preface that the version of Asp.Net Core I’m currently targeting is RC1 and some bugs and workarounds will not apply to subsequent framework versions. Moreover the Service Fabric version targeted is Service Fabric SDK (version 2.0.217) and Service Fabric Runtime (version 5.0.217).&lt;/p&gt;
 &lt;p&gt;To begin, we’ll start by configuring CookieAuthentication, OpenIdConnectAuthentication, JwtBearerAuthentication, Mvc &amp;amp; SPA routes in our Asp.Net Core Web project Startup.cs file. &lt;/p&gt;
@@ -80,11 +80,11 @@
   </entry>
   
   <entry>
-    <title> Continuous integration &amp; deployment of Azure Web Roles using TFS on-premise and WebDeploy Part 1</title>
+    <title> Continuous integration &amp; deployment of Azure Web Roles using TFS on-premise and WebDeploy - Part 1</title>
     <link href="http://www.medic-consulting.com/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/"/>
     <id>http://www.medic-consulting.com/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/</id>
     <published>2014-12-14T13:00:00.000Z</published>
-    <updated>2016-03-29T02:26:09.480Z</updated>
+    <updated>2016-06-04T14:59:28.637Z</updated>
     
     <content type="html">&lt;p&gt;Much work has gone into making continuous integration &amp;amp; deployment of Azure Websites as simple and low friction as possible with support for Visual Studio Online, Git and BitBucket etc. For customers and teams still using TFS on-premise and working with Web Roles (Azure Cloud Services) the experience is a little more involved with many resorting to rolling their own solutions, TFS Build Templates and PowerShell scripts, if tools like Octopus Deploy and platforms like appveyor are beyond reach.&lt;/p&gt;
 &lt;blockquote&gt;&lt;p&gt;Before we proceed a small caveat, in part one we’ll look at automating just the deployment of files and code which have changed. This should suffice for most single instance Dev and Test scenarios, where code is compiled and deployed on hourly, daily cycles. For Production you will also want to deploy the .cspkg file in case Azure reprovisions your Web Role instance(s).&lt;/p&gt;
@@ -163,9 +163,9 @@
     </summary>
     
     
-      <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
-    
       <category term="Asp.Net" scheme="http://www.medic-consulting.com/tags/Asp-Net/"/>
+    
+      <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
     
   </entry>
   
