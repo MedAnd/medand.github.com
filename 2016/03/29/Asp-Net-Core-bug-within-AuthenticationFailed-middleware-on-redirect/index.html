@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Asp.Net Core bug within AuthenticationFailed middleware on redirect - Medic Consulting</title>
+  <title>Asp.Net Core MVC 6, OpenIdConnect, JWT and Angular 2 SPA (Startup.cs) - Medic Consulting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such ch">
+  <meta name="description" content="Working with Asp.Net Core and Angular 2 at the time of writing may feel like a trail blazing experience, especially given the lack of documentation and stability in the underling frameworks, librarie">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Asp.Net Core bug within AuthenticationFailed middleware on redirect">
-<meta property="og:url" content="http://yoursite.com/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/index.html">
+<meta property="og:title" content="Asp.Net Core MVC 6, OpenIdConnect, JWT and Angular 2 SPA (Startup.cs)">
+<meta property="og:url" content="http://www.medic-consulting.com/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/index.html">
 <meta property="og:site_name" content="Medic Consulting">
-<meta property="og:description" content="Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such ch">
-<meta property="og:updated_time" content="2016-03-29T01:39:13.275Z">
+<meta property="og:description" content="Working with Asp.Net Core and Angular 2 at the time of writing may feel like a trail blazing experience, especially given the lack of documentation and stability in the underling frameworks, librarie">
+<meta property="og:updated_time" content="2016-06-04T14:34:00.162Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Asp.Net Core bug within AuthenticationFailed middleware on redirect">
-<meta name="twitter:description" content="Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such ch">
+<meta name="twitter:title" content="Asp.Net Core MVC 6, OpenIdConnect, JWT and Angular 2 SPA (Startup.cs)">
+<meta name="twitter:description" content="Working with Asp.Net Core and Angular 2 at the time of writing may feel like a trail blazing experience, especially given the lack of documentation and stability in the underling frameworks, librarie">
   
   
     <link rel="icon" href="/favicon.png">
@@ -23,6 +23,19 @@
   <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="/css/style.css">
   
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
 
 </head>
 
@@ -46,7 +59,7 @@
       </nav>
       <nav id="sub-nav">
         <div id="search-form-wrap">
-          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
         </div>
       </nav>
     </div>
@@ -60,7 +73,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Asp.Net Core bug within AuthenticationFailed middleware on redirect
+      Asp.Net Core MVC 6, OpenIdConnect, JWT and Angular 2 SPA (Startup.cs)
     </h1>
   
 
@@ -75,16 +88,18 @@
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Working with bleeding edge technologies is often very exciting and a trail blazing experience. With the excitement though come considerable challenges, lack of documentation and stability. One such challenge I had recently while working on a brand new Asp.Net Core MVC 6 solution, integrated with Azure AD and OpenID Connect was an Asp.Net Core RC1 bug which did not allow redirects in middleware on AuthenticationFailed.</p>
-<p>Firing up the debugger we can see that a new instance of AuthenticationProperties will do the trick, allow for the redirect to occur. The workaround looks something like:</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> Task <span class="title">AuthenticationFailed</span>(<span class="params">AuthenticationFailedContext context</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (context.AuthenticationTicket == <span class="keyword">null</span>)</span><br><span class="line">	&#123;            </span><br><span class="line">		<span class="comment">// The following is a workaround for a bug in RC1 which does not allow redirect within auth middleware</span></span><br><span class="line">		AuthenticationProperties authProperties = <span class="keyword">new</span> AuthenticationProperties</span><br><span class="line">		&#123;</span><br><span class="line">			IsPersistent = <span class="keyword">false</span>,</span><br><span class="line">			RedirectUri = (<span class="string">"/Home/Error?message=1"</span>)</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		context.HandleResponse();</span><br><span class="line">		context.AuthenticationTicket = <span class="keyword">new</span> AuthenticationTicket(context.HttpContext.User, authProperties, context.Options.AuthenticationScheme);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> Task.FromResult(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <p> Working with Asp.Net Core and Angular 2 at the time of writing may feel like a trail blazing experience, especially given the lack of documentation and stability in the underling frameworks, libraries and tools, leading to lost time in debugging and searching for answers.<br>In the hope of documenting some of my own recent experiences integrating these technologies and Microsoft’s micro-services framework <a href="https://azure.microsoft.com/en-us/services/service-fabric/" target="_blank" rel="external">Service Fabric</a>, I’ll dive into specific code areas which have proven fiddley. To start off I should preface that the version of Asp.Net Core I’m currently targeting is RC1 and some bugs and workarounds will not apply to subsequent framework versions. Moreover the Service Fabric version targeted is Service Fabric SDK (version 2.0.217) and Service Fabric Runtime (version 5.0.217).</p>
+<p>To begin, we’ll start by configuring CookieAuthentication, OpenIdConnectAuthentication, JwtBearerAuthentication, Mvc &amp; SPA routes in our Asp.Net Core Web project Startup.cs file. </p>
+<blockquote><p>Note that the below code supports multi-tenant Azure AD authentication and is meant for development scenarios as ValidateIssuer and RequireHttpsMetadata are both set to false for simplicity.</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">	&#123;</span><br><span class="line">		app.UseBrowserLink();</span><br><span class="line">		app.UseDeveloperExceptionPage();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	app.UseIISPlatformHandler();</span><br><span class="line">	app.UseStaticFiles();</span><br><span class="line"></span><br><span class="line">	app.UseCookieAuthentication(options =&gt;</span><br><span class="line">	&#123;</span><br><span class="line">		options.AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme;</span><br><span class="line">		options.AutomaticAuthenticate = <span class="literal">true</span>;</span><br><span class="line">		options.AutomaticChallenge = <span class="literal">true</span>;</span><br><span class="line">		options.CookieSecure = CookieSecureOption.Never;</span><br><span class="line">		<span class="comment">// The default setting for cookie expiration is 14 days. SlidingExpiration is set to true by default</span></span><br><span class="line">		options.ExpireTimeSpan = TimeSpan.FromHours(<span class="number">1</span>);</span><br><span class="line">		options.SlidingExpiration = <span class="literal">true</span>;</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> acmeOptions = app.ApplicationServices.GetService&lt;IOptions&lt;AcmeOptions&gt;&gt;().Value;</span><br><span class="line"></span><br><span class="line">	app.UseOpenIdConnectAuthentication(options =&gt;</span><br><span class="line">	&#123;</span><br><span class="line">		options.AutomaticAuthenticate = <span class="literal">true</span>;</span><br><span class="line">		options.AutomaticChallenge = <span class="literal">true</span>;</span><br><span class="line">		options.ClientId = acmeOptions.AzureAd.ClientId;</span><br><span class="line">		options.Authority = AcmeConstants.AuthEndpointPrefix + <span class="string">"common/"</span>;</span><br><span class="line">		options.PostLogoutRedirectUri = acmeOptions.AzureAd.PostLogoutRedirectUri;</span><br><span class="line">		options.CallbackPath = AcmeRouteConstants.LoginCallbackRoute;</span><br><span class="line">		options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;</span><br><span class="line">		options.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme;</span><br><span class="line">		options.TokenValidationParameters = <span class="keyword">new</span> TokenValidationParameters &#123; ValidateIssuer = <span class="literal">false</span> &#125;;</span><br><span class="line">		options.RequireHttpsMetadata = <span class="literal">false</span>;</span><br><span class="line">		options.Events = <span class="keyword">new</span> OpenIdConnectAuthenticationEvents(acmeOptions.AzureAd)</span><br><span class="line">		&#123;</span><br><span class="line">			OnAuthenticationFailed = context =&gt; OpenIdConnectAuthenticationEvents.GetFailedResponse(context)</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	app.UseJwtBearerAuthentication(options =&gt;</span><br><span class="line">	&#123;</span><br><span class="line">		options.AuthenticationScheme = JwtBearerDefaults.AuthenticationScheme;</span><br><span class="line">		options.Audience = acmeOptions.AzureAd.JwtAudience;</span><br><span class="line">		options.AutomaticAuthenticate = <span class="literal">true</span>;</span><br><span class="line">		options.AutomaticChallenge = <span class="literal">true</span>;</span><br><span class="line">		options.Authority = AcmeConstants.Security.AuthEndpointPrefix + <span class="string">"common/"</span>;</span><br><span class="line">		options.TokenValidationParameters = <span class="keyword">new</span> TokenValidationParameters</span><br><span class="line">		&#123;			</span><br><span class="line">			ValidateIssuer = <span class="literal">false</span>,</span><br><span class="line">		&#125;;</span><br><span class="line">		options.RequireHttpsMetadata = <span class="literal">false</span>;</span><br><span class="line">		options.Events = <span class="keyword">new</span> JwtBearerAuthenticationEvents</span><br><span class="line">		&#123;</span><br><span class="line">			OnAuthenticationFailed = context =&gt; JwtBearerAuthenticationEvents.GetFailedResponse(context)</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	app.UseMvc(routes =&gt;</span><br><span class="line">	&#123;</span><br><span class="line">		routes.MapRoute(</span><br><span class="line">			name: <span class="string">"webapi"</span>,</span><br><span class="line">			template: <span class="string">"api/&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>);</span><br><span class="line"></span><br><span class="line">		routes.MapSpaFallbackRoute(<span class="string">"spa-fallback"</span>, <span class="keyword">new</span> &#123; controller = <span class="string">"Home"</span>, action = <span class="string">"Index"</span> &#125;);</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
     
     
       <footer class="article-footer">
         
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net-Core/">Asp.Net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MVC-6/">MVC 6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Security/">Security</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net-Core/">Asp.Net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MVC-6/">MVC 6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Security/">Security</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li></ul>
 
       </footer>
     
@@ -92,6 +107,14 @@
   
     
 <nav id="article-nav">
+  
+    <a href="/2016/06/04/Visual-Studio-Online-Powershell-steps-snippets/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Visual Studio Online build step task snippets
+        
+      </div>
+    </a>
   
   
     <a href="/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/" id="article-nav-older" class="article-nav-link-wrap">

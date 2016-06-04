@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Visual Studio Online build step task snippets - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Visual Studio Online build definitions &amp;amp; tasks have certainly come a long way since the old xaml template days. There is even a VSO extensions market place. For my current project we are using goo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Visual Studio Online build step task snippets">
+<meta property="og:url" content="http://www.medic-consulting.com/2016/06/04/Visual-Studio-Online-Powershell-steps-snippets/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="Visual Studio Online build definitions &amp;amp; tasks have certainly come a long way since the old xaml template days. There is even a VSO extensions market place. For my current project we are using goo">
+<meta property="og:updated_time" content="2016-06-04T12:59:35.951Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Visual Studio Online build step task snippets">
+<meta name="twitter:description" content="Visual Studio Online build definitions &amp;amp; tasks have certainly come a long way since the old xaml template days. There is even a VSO extensions market place. For my current project we are using goo">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Visual-Studio-Online-Powershell-steps-snippets" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Visual Studio Online build step task snippets
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/06/04/Visual-Studio-Online-Powershell-steps-snippets/" class="article-date">
+  <time datetime="2016-06-03T14:00:00.000Z" itemprop="datePublished">2016-06-04</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Visual Studio Online build definitions &amp; tasks have certainly come a long way since the old xaml template days. There is even a <a href="https://marketplace.visualstudio.com/vsts/" target="_blank" rel="external">VSO extensions</a> market place. For my current project we are using good old PowerShell based tasks which work together to continuously deploy the solution from VSO to a single node Azure VM Service Fabric cluster which runs all unit, integration and automated UI tests. Some PowerShell snippets which I’ve found helpful along the way are detailed below.</p>
+<p>The following task snippet is used to check that a Service Fabric hosted Web endpoint is reachable and ready for integration and UI testing:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$statuscode</span> = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span>(<span class="variable">$statuscode</span> <span class="nomarkup">-ne</span> <span class="number">200</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">try</span> </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="variable">$statuscode</span> = (Invoke-WebRequest -Uri <span class="string">"http://localhost"</span>).statuscode</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">catch</span> </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">Write-Host</span> <span class="string">"$(Get-Date) ....http://localhost is unreachable, sleeping for 30sec"</span></span><br><span class="line">        <span class="built_in">Start-Sleep</span> -s <span class="number">30</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">Write-Host</span> <span class="string">"$(Get-Date) ....http://localhost is now reachable, continuing"</span></span><br></pre></td></tr></table></figure>
+<p>Logs the content of a test settings xml file and filters out any keys containing the string “Secret”:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[xml]<span class="variable">$testSettings</span> = <span class="built_in">Get-Content</span> -Path <span class="variable">$args</span>[<span class="number">0</span>]</span><br><span class="line"><span class="variable">$testSettings</span>.configuration.appSettings.add | <span class="built_in">Where-Object</span> &#123;<span class="variable">$_</span>.key <span class="nomarkup">-notmatch</span> <span class="string">"Secret"</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>For xUnit tests the provided Visual Studio Test step can be configured with multiple target assemblies separated by a “;” character and wherever possible enable Run In Parallel. Also note to be careful not to end the line with a “;” character as VSO will think there is a missing assembly! For example:</p>
+<p>Execution Options &gt;&gt; Test Assembly</p>
+<p><code>$(Build.SourcesDirectory)\test\AcmeCore.Test\bin\$(BuildConfiguration)\AcmeCore.Test.dll;</code><br><code>$(Build.SourcesDirectory)\test\AcmeCommon.Test\bin\$(BuildConfiguration)\AcmeCommon.Test.dll</code></p>
+<p>Advanced Execution Options &gt;&gt; Path to Custom Test Adapters</p>
+<p><code>$(Build.SourcesDirectory)\packages\xunit.runner.visualstudio.2.2.0-beta1-build1144\build\_common\xunit.runner.visualstudio.testadapter.dll</code></p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PowerShell/">PowerShell</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Visual-Studio-Online/">Visual Studio Online</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Asp.Net Core MVC 6, OpenIdConnect, JWT and Angular 2 SPA (Startup.cs)&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
