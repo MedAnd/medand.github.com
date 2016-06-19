@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Asp.Net Core RC2, OpenIdConnect, JWT, Swagger, AutoRest and Angular 2 SPA - Part 2 - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Continuing on from a previous post this article details my journey in upgrading a Service Fabric multi-tenant application from .Net Core RC1 to RC2, which turned out to be a breaking albeit worthwhile">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Asp.Net Core RC2, OpenIdConnect, JWT, Swagger, AutoRest and Angular 2 SPA - Part 2">
+<meta property="og:url" content="http://www.medic-consulting.com/2016/06/14/Asp-Net-Core-MVC-6-OpenIdConnect-JWT-and-Angular-2-SPA-Part-2/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="Continuing on from a previous post this article details my journey in upgrading a Service Fabric multi-tenant application from .Net Core RC1 to RC2, which turned out to be a breaking albeit worthwhile">
+<meta property="og:updated_time" content="2016-06-19T12:46:27.818Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Asp.Net Core RC2, OpenIdConnect, JWT, Swagger, AutoRest and Angular 2 SPA - Part 2">
+<meta name="twitter:description" content="Continuing on from a previous post this article details my journey in upgrading a Service Fabric multi-tenant application from .Net Core RC1 to RC2, which turned out to be a breaking albeit worthwhile">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a id="social-nav" href="https://www.linkedin.com/profile/view?id=AAEAAADJd3wBQV-OhfBUuu3GZdhCZ8oa_9g462M"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a id="social-nav" href="https://github.com/medand"><i class="fa fa-github" aria-hidden="true"></i></a>
+          <a id="social-nav" href="/atom.xml"><i class="fa fa-rss" aria-hidden="true"></i></a>
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Asp-Net-Core-MVC-6-OpenIdConnect-JWT-and-Angular-2-SPA-Part-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Asp.Net Core RC2, OpenIdConnect, JWT, Swagger, AutoRest and Angular 2 SPA - Part 2
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/06/14/Asp-Net-Core-MVC-6-OpenIdConnect-JWT-and-Angular-2-SPA-Part-2/" class="article-date">
+  <time datetime="2016-06-13T15:52:00.000Z" itemprop="datePublished">2016-06-14</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Continuing on from a previous post this article details my journey in upgrading a Service Fabric multi-tenant application from .Net Core RC1 to RC2, which turned out to be a breaking albeit worthwhile change, specifically for the Startup.cs class and related boot strapping code for Swagger, CookieAuthentication, OpenIdConnectAuthentication and JwtBearerAuthentication. In subsequent posts we’ll explore how .Net Core RC2 hosts web applications but for now let’s look at the first challenge encountered during the upgrade, which was to chase down all required libraries that are also .Net Core RC2 compatible.</p>
+<blockquote><p>As of the time of writing, I could only get Swashbuckle version 6.0.0-beta9 to work with .Net Core RC2. </p>
+<p>The below code supports multi-tenant Azure AD authentication and is meant for development scenarios as ValidateIssuer and RequireHttpsMetadata are both set to false for simplicity.</p>
+</blockquote>
+<p>The full dependencies section of your project.json should look something like this:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">"dependencies": &#123;</span><br><span class="line">    "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication.OpenIdConnect": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Diagnostics": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.SpaServices": "1.0.0-beta-000004",</span><br><span class="line">    "Microsoft.AspNetCore.StaticFiles": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Mvc.Formatters.Json": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.IdentityModel.Clients.ActiveDirectory": "3.9.302261508-alpha",</span><br><span class="line">    "Microsoft.Extensions.Configuration.Binder": "1.0.0-rc2-final",</span><br><span class="line">    "Swashbuckle": "6.0.0-beta9",</span><br><span class="line">    "Swashbuckle.SwaggerUi": "6.0.0-beta9",</span><br><span class="line">    "Swashbuckle.SwaggerGen": "6.0.0-beta9"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Your Startup.cs usings should look something like the below:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.AspNetCore.Authentication.Cookies;</span><br><span class="line"><span class="keyword">using</span> Microsoft.AspNetCore.Authentication.JwtBearer;</span><br><span class="line"><span class="keyword">using</span> Microsoft.AspNetCore.Authentication.OpenIdConnect;</span><br><span class="line"><span class="keyword">using</span> Microsoft.AspNetCore.Builder;</span><br><span class="line"><span class="keyword">using</span> Microsoft.AspNetCore.Hosting;</span><br><span class="line"><span class="keyword">using</span> Microsoft.AspNetCore.Http;</span><br><span class="line"><span class="keyword">using</span> Microsoft.Extensions.Configuration;</span><br><span class="line"><span class="keyword">using</span> Microsoft.Extensions.DependencyInjection;</span><br><span class="line"><span class="keyword">using</span> Microsoft.Extensions.Logging;</span><br><span class="line"><span class="keyword">using</span> Microsoft.IdentityModel.Tokens;</span><br><span class="line"><span class="keyword">using</span> Newtonsoft.Json.Serialization;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Net;</span><br></pre></td></tr></table></figure>
+<p>Having sourced the relevant libraries and compatible versions, it’s now time to turn our attention to the ConfigureServices method wherein we’ll setup Swagger, tweak Json formatting for JavaScript clients such as our Angular 2 SPA, and finally also tweak how AutoRest generates client code. I want AutoRest to generate separate files per server side controller which is achieved through a custom SwaggerOperationNameFilter.</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> IServiceProvider <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">	<span class="comment">// Add MVC service</span></span><br><span class="line">	services.AddMvc().AddJsonOptions(options =&gt;</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">// Support for JavaScript clients which assume CamelCase - starting with lower case</span></span><br><span class="line">		options.SerializerSettings.ContractResolver = <span class="keyword">new</span> CamelCasePropertyNamesContractResolver();</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Add Swagger API service</span></span><br><span class="line">	services.AddSwaggerGen();</span><br><span class="line">	services.ConfigureSwaggerGen(options =&gt;</span><br><span class="line">	&#123;</span><br><span class="line">		options.SingleApiVersion(<span class="keyword">new</span> Swashbuckle.SwaggerGen.Generator.Info</span><br><span class="line">		&#123;</span><br><span class="line">			Version = <span class="string">"v1"</span>,</span><br><span class="line">			Title = <span class="string">"Acme API"</span>,</span><br><span class="line">			Description = <span class="string">"Acme API Home"</span>,</span><br><span class="line">			TermsOfService = <span class="string">"Legal"</span></span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Controls how tools like AutoRest generate client code (separate files per server side controller)</span></span><br><span class="line">		options.OperationFilter&lt;SwaggerOperationNameFilter&gt;();</span><br><span class="line">		options.DescribeStringEnumsInCamelCase();</span><br><span class="line">		options.DescribeAllEnumsAsStrings();</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Configure IoC service</span></span><br><span class="line">	<span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line">	builder.Populate(services);</span><br><span class="line">	<span class="keyword">var</span> container = builder.Build();</span><br><span class="line">	<span class="keyword">return</span> container.Resolve&lt;IServiceProvider&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Code for the custom SwaggerOperationNameFilter:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="keyword">class</span> <span class="title">SwaggerOperationNameFilter</span> : <span class="title">IOperationFilter</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">Operation operation, OperationFilterContext context</span>)</span><br><span class="line">	</span>&#123;</span><br><span class="line">		operation.OperationId = context.ApiDescription.GroupName + <span class="string">"_"</span> + operation.OperationId;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Concluding the changes required for the .Net Core RC2 upgrade, we dive into the Configure method. Canny readers will notice that UseCookieAuthentication, UseOpenIdConnectAuthentication and UseJwtBearerAuthentication have been refactored to handle options in a more consistent manner with the rest of the .Net Core APIs. </p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory</span>)</span><br><span class="line"></span>&#123;	</span><br><span class="line">	<span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">	&#123;</span><br><span class="line">		app.UseDeveloperExceptionPage();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	app.UseStaticFiles();</span><br><span class="line"></span><br><span class="line">	app.UseCookieAuthentication(<span class="keyword">new</span> CookieAuthenticationOptions</span><br><span class="line">	&#123;</span><br><span class="line">		AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,</span><br><span class="line">		AutomaticAuthenticate = <span class="literal">true</span>,</span><br><span class="line">		AutomaticChallenge = <span class="literal">true</span>,</span><br><span class="line">		CookieSecure = CookieSecureOption.Never,</span><br><span class="line">		<span class="comment">// The default setting for cookie expiration is 14 days. SlidingExpiration is set to true by default</span></span><br><span class="line">		ExpireTimeSpan = TimeSpan.FromHours(<span class="number">1</span>),</span><br><span class="line">		SlidingExpiration = <span class="literal">true</span></span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> acmeOptions = app.ApplicationServices.GetService&lt;AcmeOptions&gt;();</span><br><span class="line"></span><br><span class="line">	app.UseOpenIdConnectAuthentication(<span class="keyword">new</span> OpenIdConnectOptions</span><br><span class="line">	&#123;</span><br><span class="line">		AutomaticAuthenticate = <span class="literal">true</span>,</span><br><span class="line">		AutomaticChallenge = <span class="literal">true</span>,</span><br><span class="line">		ClientId = acmeOptions.ClientId,</span><br><span class="line">		Authority = AcmeConstants.AuthEndpointPrefix + <span class="string">"common/"</span>,</span><br><span class="line">		PostLogoutRedirectUri = acmeOptions.PostLogoutRedirectUri,</span><br><span class="line">		CallbackPath = AcmeRouteConstants.LoginCallbackRoute,</span><br><span class="line">		SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme,</span><br><span class="line">		AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme,</span><br><span class="line">		TokenValidationParameters = <span class="keyword">new</span> TokenValidationParameters &#123; ValidateIssuer = <span class="literal">false</span> &#125;,</span><br><span class="line">		RequireHttpsMetadata = <span class="literal">false</span>,</span><br><span class="line">		Events = <span class="keyword">new</span> OpenIdConnectAuthenticationEvents(acmeOptions)</span><br><span class="line">		&#123;</span><br><span class="line">			OnAuthenticationFailed = context =&gt; OpenIdConnectAuthenticationEvents.GetFailedResponse(context)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Add JwtBearerAuthentication middleware </span></span><br><span class="line">	app.UseJwtBearerAuthentication(<span class="keyword">new</span> JwtBearerOptions</span><br><span class="line">	&#123;</span><br><span class="line">		AuthenticationScheme = JwtBearerDefaults.AuthenticationScheme,</span><br><span class="line">		Audience = acmeOptions.JwtAudience,</span><br><span class="line">		AutomaticAuthenticate = <span class="literal">true</span>,</span><br><span class="line">		AutomaticChallenge = <span class="literal">true</span>,</span><br><span class="line">		Authority = AcmeConstants.AuthEndpointPrefix + <span class="string">"common/"</span>,</span><br><span class="line">		TokenValidationParameters = <span class="keyword">new</span> TokenValidationParameters</span><br><span class="line">		&#123;</span><br><span class="line">			ValidateIssuer = <span class="literal">false</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">		RequireHttpsMetadata = <span class="literal">false</span>,</span><br><span class="line">		Events = <span class="keyword">new</span> JwtBearerAuthenticationEvents(acmeOptions)</span><br><span class="line">		&#123;</span><br><span class="line">			OnAuthenticationFailed = context =&gt; JwtBearerAuthenticationEvents.GetFailedResponse(context)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	app.UseMvc(routes =&gt;</span><br><span class="line">	&#123;</span><br><span class="line">		routes.MapRoute(</span><br><span class="line">			name: <span class="string">"webapi"</span>,</span><br><span class="line">			template: <span class="string">"api/&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>);</span><br><span class="line"></span><br><span class="line">		routes.MapSpaFallbackRoute(<span class="string">"spa-fallback"</span>, <span class="keyword">new</span> &#123; controller = <span class="string">"Home"</span>, action = <span class="string">"Index"</span> &#125;);</span><br><span class="line">	&#125;);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Enable Use of Swagger</span></span><br><span class="line">	app.UseSwaggerGen();</span><br><span class="line">	app.UseSwaggerUi();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>If you’re wondering why I left the Microsoft.IdentityModel.Clients.ActiveDirectory library at “3.9.302261508-alpha”, in upcoming posts we’ll detail a strategy for automated integration testing of your .Net Core APIs using xUnit and optionally a BDD approach (SpecFlow), but more on that topic soon…</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net-Core/">Asp.Net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Security/">Security</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/06/04/Visual-Studio-Online-Powershell-steps-snippets/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Visual Studio Online build step task snippets&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
