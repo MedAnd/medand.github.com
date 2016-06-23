@@ -69,6 +69,61 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-Ddeploy-a-Service-Fabric-Cluster-with-support-for-net-4-6" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/06/23/Ddeploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/">Deploy a Service Fabric Cluster to Azure with .NET Framework 4.6 (ARM template)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/06/23/Ddeploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/" class="article-date">
+  <time datetime="2016-06-23T13:13:00.000Z" itemprop="datePublished">2016-06-23</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>For anyone working with Service Fabric and wishing to build a solution targeting the .NET Framework 4.6, deploying to Azure is a challenge given this version of the framework is not yet available in the default Windows Server 2012 image. </p>
+<p>To overcome the above limitation and to make the process as easy as possible, we’ll employ a customised Azure Resource Manager (ARM) template which we’ll first generate via the Azure Portal.  To get started simply click on the following link <a href="https://portal.azure.com/#create/Microsoft.ServiceFabricCluster" target="_blank" rel="external">https://portal.azure.com/#create/Microsoft.ServiceFabricCluster</a> or in Azure Marketplace search for Service Fabric Cluster.</p>
+<p>As there is great guidance and content on Microsoft’s Azure portal, I won’t repeat the steps on Deploying a Service Fabric Cluster using an ARM template however I will ask you to complete all the fields as you normally would (login, password, custom ports for http and https), but instead of pressing create and deploying your cluster we’ll opt to download the ARM template.</p>
+<p>Opening the ARM template in Visual Code or your text editor of choice, search for the following json section:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"virtualMachineProfile": &#123;</span><br><span class="line">   "extensionProfile": &#123;</span><br><span class="line">      "extensions": [</span><br></pre></td></tr></table></figure>
+<p>Then add a custom script extension block with the following content:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   "name":"CustomScriptExtensionInstallNet46",</span><br><span class="line">   "properties":&#123;</span><br><span class="line">      "publisher":"Microsoft.Compute",</span><br><span class="line">      "type":"CustomScriptExtension",</span><br><span class="line">      "typeHandlerVersion":"1.7",</span><br><span class="line">      "autoUpgradeMinorVersion":false,</span><br><span class="line">      "settings":&#123;</span><br><span class="line">         "fileUris":[</span><br><span class="line">            "https://serviceprofiler.azurewebsites.net/content/downloads/InstallNetFx46.ps1"</span><br><span class="line">         ],</span><br><span class="line">         "commandToExecute":"powershell.exe -ExecutionPolicy Unrestricted -File InstallNetFx46.ps1"</span><br><span class="line">      &#125;,</span><br><span class="line">      "forceUpdateTag":"RerunExtension"</span><br><span class="line">   &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<blockquote><p>Note, for additional security self-host a copy of the InstallNetFx46.ps1 script file.</p>
+</blockquote>
+<p>Download the ARM template, in my case I also rename the file to correspond to the environment targeted (for example AcmeServiceFabricUATCluster.json) and open a PowerShell window to the same folder. Then issue the following commands, substituting the Acme values for your own:</p>
+<p><code>Login-AzureRmAccount</code></p>
+<p><code>Get-AzureRmSubscription –SubscriptionName &quot;AcmeCorp&quot; | Select-AzureRmSubscription</code></p>
+<p><code>New-AzureRmResourceGroup -Name AcmeUAT -Location &quot;West US&quot;</code></p>
+<p><code>New-AzureRmResourceGroupDeployment -Name AcmeUATDeployment -ResourceGroupName AcmeUAT -TemplateFile AcmeServiceFabricUATCluster.json</code></p>
+<p>Enter the values requested such as Password if executing interactively. Upon ARM completion your Service Fabric nodes will now contain an installation of .NET Framework 4.6… How simple! The next step is to deploy your solution…</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Azure/">Azure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DevOps/">DevOps</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-Asp-Net-Core-MVC-6-OpenIdConnect-JWT-and-Angular-2-SPA-Part-2" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Deploy a Service Fabric Cluster to Azure with .NET Framework 4.6 (ARM template) - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="For anyone working with Service Fabric and wishing to build a solution targeting the .NET Framework 4.6, deploying to Azure is a challenge given this version of the framework is not yet available in t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Deploy a Service Fabric Cluster to Azure with .NET Framework 4.6 (ARM template)">
+<meta property="og:url" content="http://www.medic-consulting.com/2016/06/23/Ddeploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="For anyone working with Service Fabric and wishing to build a solution targeting the .NET Framework 4.6, deploying to Azure is a challenge given this version of the framework is not yet available in t">
+<meta property="og:updated_time" content="2016-06-23T14:14:27.726Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Deploy a Service Fabric Cluster to Azure with .NET Framework 4.6 (ARM template)">
+<meta name="twitter:description" content="For anyone working with Service Fabric and wishing to build a solution targeting the .NET Framework 4.6, deploying to Azure is a challenge given this version of the framework is not yet available in t">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a id="social-nav" href="https://www.linkedin.com/profile/view?id=AAEAAADJd3wBQV-OhfBUuu3GZdhCZ8oa_9g462M"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a id="social-nav" href="https://github.com/medand"><i class="fa fa-github" aria-hidden="true"></i></a>
+          <a id="social-nav" href="/atom.xml"><i class="fa fa-rss" aria-hidden="true"></i></a>
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Ddeploy-a-Service-Fabric-Cluster-with-support-for-net-4-6" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Deploy a Service Fabric Cluster to Azure with .NET Framework 4.6 (ARM template)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/06/23/Ddeploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/" class="article-date">
+  <time datetime="2016-06-23T13:13:00.000Z" itemprop="datePublished">2016-06-23</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>For anyone working with Service Fabric and wishing to build a solution targeting the .NET Framework 4.6, deploying to Azure is a challenge given this version of the framework is not yet available in the default Windows Server 2012 image. </p>
+<p>To overcome the above limitation and to make the process as easy as possible, we’ll employ a customised Azure Resource Manager (ARM) template which we’ll first generate via the Azure Portal.  To get started simply click on the following link <a href="https://portal.azure.com/#create/Microsoft.ServiceFabricCluster" target="_blank" rel="external">https://portal.azure.com/#create/Microsoft.ServiceFabricCluster</a> or in Azure Marketplace search for Service Fabric Cluster.</p>
+<p>As there is great guidance and content on Microsoft’s Azure portal, I won’t repeat the steps on Deploying a Service Fabric Cluster using an ARM template however I will ask you to complete all the fields as you normally would (login, password, custom ports for http and https), but instead of pressing create and deploying your cluster we’ll opt to download the ARM template.</p>
+<p>Opening the ARM template in Visual Code or your text editor of choice, search for the following json section:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"virtualMachineProfile": &#123;</span><br><span class="line">   "extensionProfile": &#123;</span><br><span class="line">      "extensions": [</span><br></pre></td></tr></table></figure>
+<p>Then add a custom script extension block with the following content:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   "name":"CustomScriptExtensionInstallNet46",</span><br><span class="line">   "properties":&#123;</span><br><span class="line">      "publisher":"Microsoft.Compute",</span><br><span class="line">      "type":"CustomScriptExtension",</span><br><span class="line">      "typeHandlerVersion":"1.7",</span><br><span class="line">      "autoUpgradeMinorVersion":false,</span><br><span class="line">      "settings":&#123;</span><br><span class="line">         "fileUris":[</span><br><span class="line">            "https://serviceprofiler.azurewebsites.net/content/downloads/InstallNetFx46.ps1"</span><br><span class="line">         ],</span><br><span class="line">         "commandToExecute":"powershell.exe -ExecutionPolicy Unrestricted -File InstallNetFx46.ps1"</span><br><span class="line">      &#125;,</span><br><span class="line">      "forceUpdateTag":"RerunExtension"</span><br><span class="line">   &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<blockquote><p>Note, for additional security self-host a copy of the InstallNetFx46.ps1 script file.</p>
+</blockquote>
+<p>Download the ARM template, in my case I also rename the file to correspond to the environment targeted (for example AcmeServiceFabricUATCluster.json) and open a PowerShell window to the same folder. Then issue the following commands, substituting the Acme values for your own:</p>
+<p><code>Login-AzureRmAccount</code></p>
+<p><code>Get-AzureRmSubscription –SubscriptionName &quot;AcmeCorp&quot; | Select-AzureRmSubscription</code></p>
+<p><code>New-AzureRmResourceGroup -Name AcmeUAT -Location &quot;West US&quot;</code></p>
+<p><code>New-AzureRmResourceGroupDeployment -Name AcmeUATDeployment -ResourceGroupName AcmeUAT -TemplateFile AcmeServiceFabricUATCluster.json</code></p>
+<p>Enter the values requested such as Password if executing interactively. Upon ARM completion your Service Fabric nodes will now contain an installation of .NET Framework 4.6… How simple! The next step is to deploy your solution…</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Azure/">Azure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DevOps/">DevOps</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/06/14/Asp-Net-Core-MVC-6-OpenIdConnect-JWT-and-Angular-2-SPA-Part-2/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Asp.Net Core RC2, OpenIdConnect, JWT, Swagger, AutoRest and Angular 2 SPA - Part 2&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
