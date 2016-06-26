@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.medic-consulting.com/"/>
-  <updated>2016-06-23T14:14:27.726Z</updated>
+  <updated>2016-06-26T11:41:14.450Z</updated>
   <id>http://www.medic-consulting.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://www.medic-consulting.com/2016/06/23/Deploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/"/>
     <id>http://www.medic-consulting.com/2016/06/23/Deploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/</id>
     <published>2016-06-23T13:13:00.000Z</published>
-    <updated>2016-06-23T14:14:27.726Z</updated>
+    <updated>2016-06-26T11:41:14.450Z</updated>
     
     <content type="html">&lt;p&gt;For anyone working with Service Fabric and wishing to build a solution targeting the .NET Framework 4.6, deploying to Azure is a challenge given this version of the framework is not yet available in the default Windows Server 2012 image. &lt;/p&gt;
 &lt;p&gt;To overcome the above limitation and to make the process as easy as possible, we’ll employ a customised Azure Resource Manager (ARM) template which we’ll first generate via the Azure Portal.  To get started simply click on the following link &lt;a href=&quot;https://portal.azure.com/#create/Microsoft.ServiceFabricCluster&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://portal.azure.com/#create/Microsoft.ServiceFabricCluster&lt;/a&gt; or in Azure Marketplace search for Service Fabric Cluster.&lt;/p&gt;
@@ -29,7 +29,7 @@
 &lt;figure class=&quot;highlight&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&quot;virtualMachineProfile&quot;: &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &quot;extensionProfile&quot;: &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &quot;extensions&quot;: [&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;p&gt;Then add a custom script extension block with the following content:&lt;/p&gt;
 &lt;figure class=&quot;highlight&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &quot;name&quot;:&quot;CustomScriptExtensionInstallNet46&quot;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &quot;properties&quot;:&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &quot;publisher&quot;:&quot;Microsoft.Compute&quot;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &quot;type&quot;:&quot;CustomScriptExtension&quot;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &quot;typeHandlerVersion&quot;:&quot;1.7&quot;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &quot;autoUpgradeMinorVersion&quot;:false,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &quot;settings&quot;:&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &quot;fileUris&quot;:[&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &quot;https://serviceprofiler.azurewebsites.net/content/downloads/InstallNetFx46.ps1&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         ],&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;         &quot;commandToExecute&quot;:&quot;powershell.exe -ExecutionPolicy Unrestricted -File InstallNetFx46.ps1&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &amp;#125;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &quot;forceUpdateTag&quot;:&quot;RerunExtension&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;,&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;blockquote&gt;&lt;p&gt;Note, for additional security self-host a copy of the InstallNetFx46.ps1 script file.&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Note, for additional security &amp;amp; flexibility self-host a copy of the InstallNetFx46.ps1 script file.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;Download the ARM template, in my case I also rename the file to correspond to the environment targeted (for example AcmeServiceFabricUATCluster.json) and open a PowerShell window to the same folder. Then issue the following commands, substituting the Acme values for your own:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;Login-AzureRmAccount&lt;/code&gt;&lt;/p&gt;
@@ -48,9 +48,9 @@
     
       <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
     
-      <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
-    
       <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
+    
+      <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
     
   </entry>
   
@@ -87,9 +87,9 @@
     
       <category term="Asp.Net Core" scheme="http://www.medic-consulting.com/tags/Asp-Net-Core/"/>
     
-      <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
-    
       <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
+    
+      <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
     
   </entry>
   
@@ -155,9 +155,9 @@
     
       <category term="Asp.Net Core" scheme="http://www.medic-consulting.com/tags/Asp-Net-Core/"/>
     
-      <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
-    
       <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
+    
+      <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
     
   </entry>
   
@@ -187,9 +187,9 @@
     </summary>
     
     
-      <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
-    
       <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
+    
+      <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
     
   </entry>
   
