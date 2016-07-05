@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title> Asp.Net Core with Kestrel and Service Fabric - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Service Fabric SDK 2.1.150 comes with an ASP.NET Core project template so you can easily include a web app or web service in your Service Fabric application. To get started follow this official articl">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" Asp.Net Core with Kestrel and Service Fabric">
+<meta property="og:url" content="http://www.medic-consulting.com/2016/07/05/Asp-Net-Core-with-Kestrel-and-Service-Fabric/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="Service Fabric SDK 2.1.150 comes with an ASP.NET Core project template so you can easily include a web app or web service in your Service Fabric application. To get started follow this official articl">
+<meta property="og:updated_time" content="2016-07-05T13:36:08.883Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content=" Asp.Net Core with Kestrel and Service Fabric">
+<meta name="twitter:description" content="Service Fabric SDK 2.1.150 comes with an ASP.NET Core project template so you can easily include a web app or web service in your Service Fabric application. To get started follow this official articl">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a id="social-nav" href="https://www.linkedin.com/profile/view?id=AAEAAADJd3wBQV-OhfBUuu3GZdhCZ8oa_9g462M"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a id="social-nav" href="https://github.com/medand"><i class="fa fa-github" aria-hidden="true"></i></a>
+          <a id="social-nav" href="/atom.xml"><i class="fa fa-rss" aria-hidden="true"></i></a>
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Asp-Net-Core-with-Kestrel-and-Service-Fabric" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+       Asp.Net Core with Kestrel and Service Fabric
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/07/05/Asp-Net-Core-with-Kestrel-and-Service-Fabric/" class="article-date">
+  <time datetime="2016-07-05T11:32:00.000Z" itemprop="datePublished">2016-07-05</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Service Fabric SDK 2.1.150 comes with an ASP.NET Core project template so you can easily include a web app or web service in your Service Fabric application. To get started follow this official article: <a href="https://azure.microsoft.com/en-us/documentation/articles/service-fabric-add-a-web-frontend" target="_blank" rel="external">Build a web service front end for your application</a>, but for more advanced scenarios such as hosting your .Net Core web application outside Service Fabric (for those times you just don’t want to deploy), forcing Kestrel to listen to all machine assigned IP addresses, we’ll customise and extend the starter template generated code. Moreover, with .Net Core RC2 and RTM the ubiquities dotnet.exe becomes our preferred tool of choice so let’s facilitate running your Service Fabric Web app for development and debugging with the same simple command dotnet.exe run.</p>
+<p>As always and given I am still targeting .Net Core RC2, we’ll start with the required project.json dependencies which should look something like the below. For command line argument heavily lifting include the “CommandLineParser”: “2.0.275-beta” package.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">"dependencies": &#123;</span><br><span class="line">    "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Authentication.OpenIdConnect": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Diagnostics": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.SpaServices": "1.0.0-beta-000004",</span><br><span class="line">    "Microsoft.AspNetCore.StaticFiles": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Mvc.Formatters.Json": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-final",  </span><br><span class="line">    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final",</span><br><span class="line">    "Microsoft.IdentityModel.Clients.ActiveDirectory": "3.9.302261508-alpha",</span><br><span class="line">    "Microsoft.Extensions.Configuration.Binder": "1.0.0-rc2-final",</span><br><span class="line">    "Swashbuckle": "6.0.0-beta9",</span><br><span class="line">    "Swashbuckle.SwaggerUi": "6.0.0-beta9",</span><br><span class="line">    "Swashbuckle.SwaggerGen": "6.0.0-beta9",</span><br><span class="line">    "CommandLineParser": "2.0.275-beta",</span><br><span class="line">    "Microsoft.ServiceFabric": "5.1.150",</span><br><span class="line">    "Microsoft.ServiceFabric.Data": "2.1.150",</span><br><span class="line">    "Microsoft.ServiceFabric.Services": "2.1.150",</span><br><span class="line">    "Microsoft.AspNetCore.Http.Abstractions": "1.0.0-rc2-final"</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<p>In your Program.cs which contains the generated starter template code add the following usings:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> CommandLine;</span><br><span class="line"><span class="keyword">using</span> Microsoft.AspNetCore.Hosting;</span><br><span class="line"><span class="keyword">using</span> Microsoft.ServiceFabric.Services.Communication.Runtime;</span><br><span class="line"><span class="keyword">using</span> Microsoft.ServiceFabric.Services.Runtime;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Fabric;</span><br><span class="line"><span class="keyword">using</span> System.Threading;</span><br><span class="line"><span class="keyword">using</span> System.Threading.Tasks;</span><br></pre></td></tr></table></figure>
+<p>Since we want to host our .Net Core web application both within Service Fabric and outside for quick turnaround during development and debugging without the hassle of always deploying, we modify Main to support both scenarios:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">	<span class="keyword">var</span> parser = <span class="keyword">new</span> Parser(with =&gt; &#123;</span><br><span class="line">		with.EnableDashDash = <span class="literal">true</span>;</span><br><span class="line">		with.HelpWriter = Console.Out;</span><br><span class="line">	&#125;);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">var</span> result = parser.ParseArguments&lt;Options&gt;(args);</span><br><span class="line"></span><br><span class="line">	result.MapResult(</span><br><span class="line">	options =&gt; </span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (options.Host.ToLower() == AcmeConstants.ServiceFabricHost)</span><br><span class="line">		&#123;</span><br><span class="line">			ServiceRuntime.RegisterServiceAsync(<span class="string">"WebType"</span>, context =&gt; <span class="keyword">new</span> WebHostingService(context, <span class="string">"WebTypeEndpoint"</span>)).GetAwaiter().GetResult();</span><br><span class="line">			Thread.Sleep(Timeout.Infinite);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="function"><span class="keyword">else</span> <span class="title">if</span>(<span class="params">options.Host.ToLower(</span>) </span>== AcmeConstants.SelfHost)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">using</span> (<span class="keyword">var</span> host = WebHostBuilderHelper.GetWebHost(<span class="keyword">new</span> WebHostBuilder(), options.Protocol, options.Port))</span><br><span class="line">			&#123;</span><br><span class="line">				host.Run();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;, </span><br><span class="line">	errors =&gt; </span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>AcmeConstants.ServiceFabricHost</code> - value of command line argument: service-fabric-host<br><code>AcmeConstants.SelfHost</code> - value of command line argument: self-host</p>
+<p>We then need to create an Options class to be used by the CommandLineParser:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title">Options</span></span><br><span class="line">&#123;</span><br><span class="line">	[Option(Default = <span class="string">"self-host"</span>, HelpText = <span class="string">"The target host - Options [self-host] or [service-fabric-host]"</span>)]</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">string</span> Host &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">	[Option(Default = <span class="string">"http"</span>, HelpText = <span class="string">"The target protocol - Options [http] or [https]"</span>)]</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">string</span> Protocol &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">	[Option(Default = <span class="string">"localhost"</span>, HelpText = <span class="string">"The target IP Address or Uri - Example [localhost] or [127.0.0.1]"</span>)]</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">string</span> IpAddressOrFQDN &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">	[Option(Default = <span class="string">"5000"</span>, HelpText = <span class="string">"The target port - Example [80] or [5000]"</span>)]</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">string</span> Port &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We replace the generated OpenAsync code with the following version:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Task&lt;<span class="keyword">string</span>&gt; ICommunicationListener.OpenAsync(CancellationToken cancellationToken)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">var</span> endpoint = FabricRuntime.GetActivationContext().GetEndpoint(_endpointName);</span><br><span class="line">	<span class="keyword">string</span> serverUrl = $<span class="string">"&#123;endpoint.Protocol&#125;://&#123;FabricRuntime.GetNodeContext().IPAddressOrFQDN&#125;:&#123;endpoint.Port&#125;"</span>;</span><br><span class="line"></span><br><span class="line">	_webHost = WebHostBuilderHelper.GetWebHost(<span class="keyword">new</span> WebHostBuilder(), endpoint.Protocol.ToString(), endpoint.Port.ToString());</span><br><span class="line">	_webHost.Start();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> Task.FromResult(serverUrl);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Lastly we create our common GetWebHost method:  </p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">WebHostBuilderHelper</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IWebHost <span class="title">GetWebHost</span>(<span class="params">IWebHostBuilder webHostBuilder, <span class="keyword">string</span> protocol, <span class="keyword">string</span> port</span>)</span><br><span class="line">	</span>&#123;</span><br><span class="line">		IWebHost webHost = webHostBuilder</span><br><span class="line">			.UseKestrel()</span><br><span class="line">			.UseContentRoot(Directory.GetCurrentDirectory())</span><br><span class="line">			.UseWebRoot(Path.Combine(Directory.GetCurrentDirectory(), <span class="string">"wwwroot"</span>))</span><br><span class="line">			.UseUrls($<span class="string">"&#123;protocol&#125;://+:&#123;port&#125;"</span>)</span><br><span class="line">			.UseStartup&lt;Startup&gt;()</span><br><span class="line">			.Build();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> webHost;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note, I prefer to use the following which instructs Kestrel to listen to all IP addresses assigned to the machine on the port specified:</p>
+<p><code>.UseUrls($&quot;{protocol}://+:{port}&quot;)</code></p>
+<p>All that is now left to do is within your .Net Core Web Application PackageRoot, edit the ServiceManifest.xml CodePackage so that we tell Web.exe to “host” within Service Fabric in this scenario:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">CodePackage</span> <span class="attr">Name</span>=<span class="string">"C"</span> <span class="attr">Version</span>=<span class="string">"1.0.0"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">EntryPoint</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">ExeHost</span>&gt;</span></span><br><span class="line">	  <span class="tag">&lt;<span class="name">Program</span>&gt;</span>Web.exe<span class="tag">&lt;/<span class="name">Program</span>&gt;</span></span><br><span class="line">	  <span class="tag">&lt;<span class="name">Arguments</span>&gt;</span>--host service-fabric-host<span class="tag">&lt;/<span class="name">Arguments</span>&gt;</span></span><br><span class="line">	  <span class="tag">&lt;<span class="name">WorkingFolder</span>&gt;</span>CodePackage<span class="tag">&lt;/<span class="name">WorkingFolder</span>&gt;</span></span><br><span class="line">	  <span class="tag">&lt;<span class="name">ConsoleRedirection</span> <span class="attr">FileRetentionCount</span>=<span class="string">"5"</span> <span class="attr">FileMaxSizeInKb</span>=<span class="string">"2048"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">ExeHost</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">EntryPoint</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">CodePackage</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Your .Net Core Web application will now run both within Service Fabric and in debug mode. To run from the command line, from within your Web application folder issue:</p>
+<p><code>dotnet.exe run</code></p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net-Core/">Asp.Net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/06/23/Deploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Deploy a Service Fabric Cluster to Azure with .NET Framework 4.6 (ARM template)&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
