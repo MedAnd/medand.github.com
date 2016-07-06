@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.medic-consulting.com/"/>
-  <updated>2016-07-06T13:49:27.410Z</updated>
+  <updated>2016-07-06T13:50:48.694Z</updated>
   <id>http://www.medic-consulting.com/</id>
   
   <author>
@@ -19,8 +19,8 @@
     <title>Create or convert your Service Fabric Microservices to .Net Core xproj structure</title>
     <link href="http://www.medic-consulting.com/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/"/>
     <id>http://www.medic-consulting.com/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/</id>
-    <published>2016-07-06T12:29:01.000Z</published>
-    <updated>2016-07-06T13:49:27.410Z</updated>
+    <published>2016-07-06T12:29:00.000Z</published>
+    <updated>2016-07-06T13:50:48.694Z</updated>
     
     <content type="html">&lt;p&gt;In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debugging. Today we’ll discuss how we can create a new .Net Core Service Fabric Microservice targeting the full stack (.net46), given the VS 2015 template only supports web projects currently. Note that similar principles would apply to converting existing Microservice projects to .Net Core xproj structure.&lt;/p&gt;
 &lt;p&gt;To begin, in Visual Studio 2015 add a new Service Fabric Project, in my example a Stateful Service named AcmeService:&lt;/p&gt;
@@ -47,6 +47,10 @@
     
     </summary>
     
+    
+      <category term="Asp.Net Core" scheme="http://www.medic-consulting.com/tags/Asp-Net-Core/"/>
+    
+      <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
     
   </entry>
   
