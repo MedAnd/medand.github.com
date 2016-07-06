@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.medic-consulting.com/"/>
-  <updated>2016-07-06T11:42:30.829Z</updated>
+  <updated>2016-07-06T13:46:08.718Z</updated>
   <id>http://www.medic-consulting.com/</id>
   
   <author>
@@ -14,6 +14,41 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Create or convert your Service Fabric Microservices to .Net Core xproj structure</title>
+    <link href="http://www.medic-consulting.com/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/"/>
+    <id>http://www.medic-consulting.com/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/</id>
+    <published>2016-07-06T12:29:01.000Z</published>
+    <updated>2016-07-06T13:46:08.718Z</updated>
+    
+    <content type="html">&lt;p&gt;In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debugging. Today we’ll discuss how we can create a new .Net Core Service Fabric Microservice targeting the full stack (.net46) as the VS 2015 template only supports web projects currently. Note that similar principles would apply to converting existing Microservice projects to .Net Core xproj structure.&lt;/p&gt;
+&lt;p&gt;To begin, in Visual Studio 2015 add a new Service Fabric Project, in my example a Stateful Service named AcmeService:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/002_AcmeService.jpg&quot; alt=&quot;New Service Fabric project&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Once complete you should have a solution resembling the below:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/003_AcmeSolution.jpg&quot; alt=&quot;Service Fabric solution&quot;&gt;&lt;/p&gt;
+&lt;p&gt;What we do next is remove the AcmeService project from the solution altogether and rename the folder to AcmeService.tmp. We will re-create the project as a .Net Core Console Application.  Select Add New Project and select Console Application (.Net Core), making sure the location is the same as the original and enter AcmeService as the project name:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/004_AcmeProjectAsXproj.jpg&quot; alt=&quot;AcmeService as a .Net Core Console project&quot;&gt;&lt;/p&gt;
+&lt;p&gt;From the AcmeService.tmp folder copy:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;PackageRoot folder&lt;/code&gt;&lt;br&gt;&lt;code&gt;Properties folder&lt;/code&gt;&lt;br&gt;&lt;code&gt;AcmeService.cs (copy over target file)&lt;/code&gt;&lt;br&gt;&lt;code&gt;Program.cs&lt;/code&gt;&lt;br&gt;&lt;code&gt;ServiceEventSource.cs&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;to the AcmeService folder, your solution resembling:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/005_FinalAcmeProjectAsXproj.jpg&quot; alt=&quot;Service Fabric solution with .Net Core xproj structure&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Copy the contents of the below into your project.json file:&lt;/p&gt;
+&lt;figure class=&quot;highlight json&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;21&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;22&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;23&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;24&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;25&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;26&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;27&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;28&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;29&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;30&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;title&quot;&lt;/span&gt;: &lt;span class=&quot;string&quot;&gt;&quot;AcmeService&quot;&lt;/span&gt;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;description&quot;&lt;/span&gt;: &lt;span class=&quot;string&quot;&gt;&quot;AcmeService&quot;&lt;/span&gt;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;copyright&quot;&lt;/span&gt;: &lt;span class=&quot;string&quot;&gt;&quot;Copyright © Acme 2016&quot;&lt;/span&gt;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;version&quot;&lt;/span&gt;: &lt;span class=&quot;string&quot;&gt;&quot;1.0.0-*&quot;&lt;/span&gt;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;buildOptions&quot;&lt;/span&gt;: &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;attr&quot;&gt;&quot;emitEntryPoint&quot;&lt;/span&gt;: &lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;attr&quot;&gt;&quot;preserveCompilationContext&quot;&lt;/span&gt;: &lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;attr&quot;&gt;&quot;compile&quot;&lt;/span&gt;: &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      &lt;span class=&quot;attr&quot;&gt;&quot;exclude&quot;&lt;/span&gt;: [&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;string&quot;&gt;&quot;PackageRoot&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;      ]&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#125; &lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &amp;#125;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;dependencies&quot;&lt;/span&gt;: &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;attr&quot;&gt;&quot;Microsoft.ServiceFabric&quot;&lt;/span&gt;: &lt;span class=&quot;string&quot;&gt;&quot;5.1.150&quot;&lt;/span&gt;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;attr&quot;&gt;&quot;Microsoft.ServiceFabric.Services&quot;&lt;/span&gt;: &lt;span class=&quot;string&quot;&gt;&quot;2.1.150&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &amp;#125;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;frameworks&quot;&lt;/span&gt;: &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;attr&quot;&gt;&quot;net46&quot;&lt;/span&gt;: &amp;#123; &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &amp;#125;,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &lt;span class=&quot;attr&quot;&gt;&quot;runtimes&quot;&lt;/span&gt;: &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;attr&quot;&gt;&quot;win7-x64&quot;&lt;/span&gt;: &amp;#123; &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;Lastly we have to add back our .Net Core Console Application project by right clicking on the Service Fabric project and selecting Add Existing Service Fabric Service. You might get a warning about updating but just click OK. You can also delete the AcmeService.tmp folder as it’s no longer needed.&lt;/p&gt;
+&lt;p&gt;To compile you can use Visual Studio or at a command prompt you can issue normal dotnet.exe commands, for example:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;dotnet.exe build&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;In the next series of articles we’ll look at some more advanced topics such as sharing appsettings.json files between Web and other Microservice projects, as well as logging to Application Insights.&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-host
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title> Asp.Net Core with Kestrel and Service Fabric</title>
@@ -90,9 +125,9 @@
     
       <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
     
-      <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
-    
       <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
+    
+      <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
     
   </entry>
   
@@ -229,9 +264,9 @@
     </summary>
     
     
-      <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
-    
       <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
+    
+      <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
     
   </entry>
   

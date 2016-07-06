@@ -69,6 +69,57 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/">Create or convert your Service Fabric Microservices to .Net Core xproj structure</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/" class="article-date">
+  <time datetime="2016-07-06T12:29:01.000Z" itemprop="datePublished">2016-07-06</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debugging. Today we’ll discuss how we can create a new .Net Core Service Fabric Microservice targeting the full stack (.net46) as the VS 2015 template only supports web projects currently. Note that similar principles would apply to converting existing Microservice projects to .Net Core xproj structure.</p>
+<p>To begin, in Visual Studio 2015 add a new Service Fabric Project, in my example a Stateful Service named AcmeService:</p>
+<p><img src="/images/002_AcmeService.jpg" alt="New Service Fabric project"></p>
+<p>Once complete you should have a solution resembling the below:</p>
+<p><img src="/images/003_AcmeSolution.jpg" alt="Service Fabric solution"></p>
+<p>What we do next is remove the AcmeService project from the solution altogether and rename the folder to AcmeService.tmp. We will re-create the project as a .Net Core Console Application.  Select Add New Project and select Console Application (.Net Core), making sure the location is the same as the original and enter AcmeService as the project name:</p>
+<p><img src="/images/004_AcmeProjectAsXproj.jpg" alt="AcmeService as a .Net Core Console project"></p>
+<p>From the AcmeService.tmp folder copy:</p>
+<p><code>PackageRoot folder</code><br><code>Properties folder</code><br><code>AcmeService.cs (copy over target file)</code><br><code>Program.cs</code><br><code>ServiceEventSource.cs</code></p>
+<p>to the AcmeService folder, your solution resembling:</p>
+<p><img src="/images/005_FinalAcmeProjectAsXproj.jpg" alt="Service Fabric solution with .Net Core xproj structure"></p>
+<p>Copy the contents of the below into your project.json file:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"title"</span>: <span class="string">"AcmeService"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"AcmeService"</span>,</span><br><span class="line">  <span class="attr">"copyright"</span>: <span class="string">"Copyright © Acme 2016"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0-*"</span>,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"buildOptions"</span>: &#123;</span><br><span class="line">    <span class="attr">"emitEntryPoint"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"preserveCompilationContext"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"compile"</span>: &#123;</span><br><span class="line">      <span class="attr">"exclude"</span>: [</span><br><span class="line">        <span class="string">"PackageRoot"</span></span><br><span class="line">      ]</span><br><span class="line">    &#125; </span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric"</span>: <span class="string">"5.1.150"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric.Services"</span>: <span class="string">"2.1.150"</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"frameworks"</span>: &#123;</span><br><span class="line">    <span class="attr">"net46"</span>: &#123; &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"runtimes"</span>: &#123;</span><br><span class="line">    <span class="attr">"win7-x64"</span>: &#123; &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Lastly we have to add back our .Net Core Console Application project by right clicking on the Service Fabric project and selecting Add Existing Service Fabric Service. You might get a warning about updating but just click OK. You can also delete the AcmeService.tmp folder as it’s no longer needed.</p>
+<p>To compile you can use Visual Studio or at a command prompt you can issue normal dotnet.exe commands, for example:</p>
+<p><code>dotnet.exe build</code></p>
+<p>In the next series of articles we’ll look at some more advanced topics such as sharing appsettings.json files between Web and other Microservice projects, as well as logging to Application Insights.</p>
+
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-Asp-Net-Core-with-Kestrel-and-Service-Fabric" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     

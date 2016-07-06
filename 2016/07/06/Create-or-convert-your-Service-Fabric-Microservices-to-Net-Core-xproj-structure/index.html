@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Create or convert your Service Fabric Microservices to .Net Core xproj structure - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Create or convert your Service Fabric Microservices to .Net Core xproj structure">
+<meta property="og:url" content="http://www.medic-consulting.com/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debu">
+<meta property="og:image" content="http://www.medic-consulting.com/images/002_AcmeService.jpg">
+<meta property="og:image" content="http://www.medic-consulting.com/images/003_AcmeSolution.jpg">
+<meta property="og:image" content="http://www.medic-consulting.com/images/004_AcmeProjectAsXproj.jpg">
+<meta property="og:image" content="http://www.medic-consulting.com/images/005_FinalAcmeProjectAsXproj.jpg">
+<meta property="og:updated_time" content="2016-07-06T13:46:08.718Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Create or convert your Service Fabric Microservices to .Net Core xproj structure">
+<meta name="twitter:description" content="In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debu">
+<meta name="twitter:image" content="http://www.medic-consulting.com/images/002_AcmeService.jpg">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a id="social-nav" href="https://www.linkedin.com/profile/view?id=AAEAAADJd3wBQV-OhfBUuu3GZdhCZ8oa_9g462M"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a id="social-nav" href="https://github.com/medand"><i class="fa fa-github" aria-hidden="true"></i></a>
+          <a id="social-nav" href="/atom.xml"><i class="fa fa-rss" aria-hidden="true"></i></a>
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Create or convert your Service Fabric Microservices to .Net Core xproj structure
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/" class="article-date">
+  <time datetime="2016-07-06T12:29:01.000Z" itemprop="datePublished">2016-07-06</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debugging. Today we’ll discuss how we can create a new .Net Core Service Fabric Microservice targeting the full stack (.net46) as the VS 2015 template only supports web projects currently. Note that similar principles would apply to converting existing Microservice projects to .Net Core xproj structure.</p>
+<p>To begin, in Visual Studio 2015 add a new Service Fabric Project, in my example a Stateful Service named AcmeService:</p>
+<p><img src="/images/002_AcmeService.jpg" alt="New Service Fabric project"></p>
+<p>Once complete you should have a solution resembling the below:</p>
+<p><img src="/images/003_AcmeSolution.jpg" alt="Service Fabric solution"></p>
+<p>What we do next is remove the AcmeService project from the solution altogether and rename the folder to AcmeService.tmp. We will re-create the project as a .Net Core Console Application.  Select Add New Project and select Console Application (.Net Core), making sure the location is the same as the original and enter AcmeService as the project name:</p>
+<p><img src="/images/004_AcmeProjectAsXproj.jpg" alt="AcmeService as a .Net Core Console project"></p>
+<p>From the AcmeService.tmp folder copy:</p>
+<p><code>PackageRoot folder</code><br><code>Properties folder</code><br><code>AcmeService.cs (copy over target file)</code><br><code>Program.cs</code><br><code>ServiceEventSource.cs</code></p>
+<p>to the AcmeService folder, your solution resembling:</p>
+<p><img src="/images/005_FinalAcmeProjectAsXproj.jpg" alt="Service Fabric solution with .Net Core xproj structure"></p>
+<p>Copy the contents of the below into your project.json file:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"title"</span>: <span class="string">"AcmeService"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"AcmeService"</span>,</span><br><span class="line">  <span class="attr">"copyright"</span>: <span class="string">"Copyright © Acme 2016"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0-*"</span>,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"buildOptions"</span>: &#123;</span><br><span class="line">    <span class="attr">"emitEntryPoint"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"preserveCompilationContext"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"compile"</span>: &#123;</span><br><span class="line">      <span class="attr">"exclude"</span>: [</span><br><span class="line">        <span class="string">"PackageRoot"</span></span><br><span class="line">      ]</span><br><span class="line">    &#125; </span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric"</span>: <span class="string">"5.1.150"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric.Services"</span>: <span class="string">"2.1.150"</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"frameworks"</span>: &#123;</span><br><span class="line">    <span class="attr">"net46"</span>: &#123; &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"runtimes"</span>: &#123;</span><br><span class="line">    <span class="attr">"win7-x64"</span>: &#123; &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Lastly we have to add back our .Net Core Console Application project by right clicking on the Service Fabric project and selecting Add Existing Service Fabric Service. You might get a warning about updating but just click OK. You can also delete the AcmeService.tmp folder as it’s no longer needed.</p>
+<p>To compile you can use Visual Studio or at a command prompt you can issue normal dotnet.exe commands, for example:</p>
+<p><code>dotnet.exe build</code></p>
+<p>In the next series of articles we’ll look at some more advanced topics such as sharing appsettings.json files between Web and other Microservice projects, as well as logging to Application Insights.</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/07/05/Asp-Net-Core-with-Kestrel-and-Service-Fabric/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"> Asp.Net Core with Kestrel and Service Fabric&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
