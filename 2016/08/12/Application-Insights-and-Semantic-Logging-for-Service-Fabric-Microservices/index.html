@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Application Insights &amp; Semantic Logging for Service Fabric Microservices - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Borrowing heavily from MSDN documentation, the term semantic logging refers specifically to the use of strongly typed events and consistent structure of log messages. In Service Fabric sematic logging">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Application Insights & Semantic Logging for Service Fabric Microservices">
+<meta property="og:url" content="http://www.medic-consulting.com/2016/08/12/Application-Insights-and-Semantic-Logging-for-Service-Fabric-Microservices/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="Borrowing heavily from MSDN documentation, the term semantic logging refers specifically to the use of strongly typed events and consistent structure of log messages. In Service Fabric sematic logging">
+<meta property="og:image" content="http://www.medic-consulting.com/images/006_AcmeServiceProjectSemanticLogging.jpg">
+<meta property="og:updated_time" content="2016-08-14T13:43:46.712Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Application Insights & Semantic Logging for Service Fabric Microservices">
+<meta name="twitter:description" content="Borrowing heavily from MSDN documentation, the term semantic logging refers specifically to the use of strongly typed events and consistent structure of log messages. In Service Fabric sematic logging">
+<meta name="twitter:image" content="http://www.medic-consulting.com/images/006_AcmeServiceProjectSemanticLogging.jpg">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a id="social-nav" href="https://www.linkedin.com/profile/view?id=AAEAAADJd3wBQV-OhfBUuu3GZdhCZ8oa_9g462M"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a id="social-nav" href="https://github.com/medand"><i class="fa fa-github" aria-hidden="true"></i></a>
+          <a id="social-nav" href="/atom.xml"><i class="fa fa-rss" aria-hidden="true"></i></a>
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Application-Insights-and-Semantic-Logging-for-Service-Fabric-Microservices" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Application Insights &amp; Semantic Logging for Service Fabric Microservices
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/08/12/Application-Insights-and-Semantic-Logging-for-Service-Fabric-Microservices/" class="article-date">
+  <time datetime="2016-08-12T12:01:03.000Z" itemprop="datePublished">2016-08-12</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Borrowing heavily from MSDN documentation, the term semantic logging refers specifically to the use of strongly typed events and consistent structure of log messages. In Service Fabric sematic logging is baked right into the platform and tooling. For example if we look at any auto generated .cs file for an actor, stateful or stateless service we see examples of logging via the ServiceEventSource or ActorEventSource classes:</p>
+<p><code>ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(AcmeService).Name);</code></p>
+<p>When an event such as the one above is logged, it includes a payload containing individual variables as typed values that match a pre-defined schema. Moreover as we’ll see later on in this article, when the event is routed to a suitable destination such as Application Insights, the event’s payload is written as discrete elements making it much easier to analyse, correlate and query. For those new to Application Insights the following <a href="https://azure.microsoft.com/en-us/documentation/articles/app-insights-overview/" target="_blank" rel="external">offical introduction</a> provides a good starting point. </p>
+<p>Having briefly defined semantic logging and mentioning that it’s baked into Service Fabric we should clarify that ServiceEventSource and ActorEventSource inherit from EventSource, which in turn writes events to ETW. Event Tracing for Windows or more commonly ETW is an efficient kernel-level tracing facility built into Windows that logs kernel or application-defined events. </p>
+<p>Given the above we now turn our attention to exporting these ETW events to Application Insights or for that matter to any other supported target via two libraries, the Microsoft library aptly named <a href="https://github.com/mspnp/semantic-logging/" target="_blank" rel="external">Semantic Logging</a> (formerly known as the Semantic Logging Application Block or SLAB) and the <a href="https://github.com/fidmor89/SLAB_AppInsights/" target="_blank" rel="external">SemanticLogging.ApplicationInsights</a> library (also known as SLAB_AppInsights).</p>
+<p>As all my Service Fabric projects are in .Net Core xproj structure (see previous articles) I ended up contributing to Fidel’s excellent library by converting the SemanticLogging.ApplicationInsights project to .Net Core xproj. My humble contribution has been merged into the master SemanticLogging.ApplicationInsights branch by Fidel and is used in the rest of the article below. As the NuGet package is somewhat behind, we’ll first start by downloading the master branch directly from GitHub and by adding it to our Visual Studio 2015 solution. Your solution will end-up looking something like this:</p>
+<p><img src="/images/006_AcmeServiceProjectSemanticLogging.jpg" alt="Semantic Logging &amp; Application Insights"></p>
+<p>In your Service Fabric service (in my example AcmeService) edit the project.json:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"title"</span>: <span class="string">"AcmeService"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"AcmeService"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0-*"</span>,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"buildOptions"</span>: &#123;</span><br><span class="line">    <span class="attr">"emitEntryPoint"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"preserveCompilationContext"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"compile"</span>: &#123;</span><br><span class="line">      <span class="attr">"exclude"</span>: [</span><br><span class="line">        <span class="string">"PackageRoot"</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric"</span>: <span class="string">"5.1.150"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric.Services"</span>: <span class="string">"2.1.150"</span>,</span><br><span class="line">    <span class="attr">"EnterpriseLibrary.SemanticLogging"</span>: <span class="string">"2.0.1406.1"</span>,</span><br><span class="line">    <span class="attr">"SemanticLogging.ApplicationInsights"</span>: <span class="string">"1.0.0-*"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.Extensions.PlatformAbstractions"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.Extensions.Configuration"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.Extensions.Configuration.FileExtensions"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.Extensions.Configuration.Json"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.Extensions.Configuration.Binder"</span>: <span class="string">"1.0.0"</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"frameworks"</span>: &#123;</span><br><span class="line">    <span class="attr">"net46"</span>: &#123;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"runtimes"</span>: &#123;</span><br><span class="line">    <span class="attr">"win7-x64"</span>: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Add an appsettings.Development.json file and make sure to set your ASPNETCORE_ENVIRONMENT variable accordingly. Moreover you will need to set the Application Insights InstrumentationKey.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"Logging"</span>: &#123;</span><br><span class="line">    <span class="attr">"IncludeScopes"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"LogLevel"</span>: &#123;</span><br><span class="line">      <span class="attr">"Default"</span>: <span class="string">"Debug"</span>,</span><br><span class="line">      <span class="attr">"System"</span>: <span class="string">"Information"</span>,</span><br><span class="line">      <span class="attr">"Microsoft"</span>: <span class="string">"Information"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"ApplicationInsights"</span>: &#123;</span><br><span class="line">    <span class="attr">"InstrumentationKey"</span>: <span class="string">"YOUR KEY GOES HERE"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We’ll add an AppSettings class so that we can bind our settings file to a strongly typed object:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">AcmeService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AppSettings</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">AppSettings</span>(<span class="params"></span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            ApplicationInsights = <span class="keyword">new</span> ApplicationInsightsOptions();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> ApplicationInsightsOptions ApplicationInsights &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ApplicationInsightsOptions</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> InstrumentationKey &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>In a previous article we looked out how to share Asp.Net Core appsettings.json with Service Fabric Microservices so we’ll re-use the same logic and create a ConfigurationHelper:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.Extensions.PlatformAbstractions;</span><br><span class="line"><span class="keyword">using</span> Microsoft.Extensions.Configuration;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">AcmeService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">ConfigurationHelper</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> AppSettings <span class="title">GetAppSettings</span>(<span class="params"></span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> appSettings = <span class="keyword">new</span> AppSettings();</span><br><span class="line">            <span class="keyword">var</span> configRoot = GetConfigurationRoot();</span><br><span class="line">            configRoot.Bind(appSettings);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> appSettings;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IConfigurationRoot <span class="title">GetConfigurationRoot</span>(<span class="params"></span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            IConfigurationRoot configuration = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">var</span> basePath = PlatformServices.Default.Application.ApplicationBasePath;</span><br><span class="line">            <span class="keyword">var</span> environmentName = Environment.GetEnvironmentVariable(<span class="string">"ASPNETCORE_ENVIRONMENT"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(environmentName))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">var</span> configurationBuilder = <span class="keyword">new</span> ConfigurationBuilder()</span><br><span class="line">                    .SetBasePath(basePath)</span><br><span class="line">                    .AddJsonFile($<span class="string">"appsettings.&#123;environmentName&#125;.json"</span>);</span><br><span class="line"></span><br><span class="line">                configuration = configurationBuilder.Build();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> configuration;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Now for the secret sauce, we create a LoggingHelper class which returns an ObservableEventListener. The class configures the Application Insights sink from the SemanticLogging.ApplicationInsights library:</p>
+<p><code>listener.LogToApplicationInsights(...)</code></p>
+<p>and subscribes to Service Fabric ServiceEventSource events using the Semantic Logging library:</p>
+<p><code>listener.EnableEvents(ServiceEventSource.Current.Name, EventLevel.Verbose);</code></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.ApplicationInsights.Extensibility;</span><br><span class="line"><span class="keyword">using</span> Microsoft.Practices.EnterpriseLibrary.SemanticLogging;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Diagnostics.Tracing;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">AcmeService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">LoggingHelper</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ObservableEventListener <span class="title">GetEventListener</span>(<span class="params"></span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            ObservableEventListener listener = <span class="keyword">new</span> ObservableEventListener();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">var</span> appSettings = ConfigurationHelper.GetAppSettings();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (appSettings != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    TelemetryConfiguration.CreateDefault();</span><br><span class="line">                    TelemetryConfiguration.Active.InstrumentationKey = appSettings.ApplicationInsights.InstrumentationKey;</span><br><span class="line"></span><br><span class="line">                    listener.LogToApplicationInsights(TelemetryConfiguration.Active.InstrumentationKey, <span class="keyword">new</span> List&lt;ITelemetryInitializer&gt;(TelemetryConfiguration.Active.TelemetryInitializers).ToArray());</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                listener.EnableEvents(ServiceEventSource.Current.Name, EventLevel.Verbose);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (Exception ex)</span><br><span class="line">            &#123;</span><br><span class="line">                ServiceEventSource.Current.Message(ex.ToString());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> listener;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>All that is now left is the addition of a “one liner” to your Service Fabric Microservice (Program.cs) to enable Semantic Logging:</p>
+<p><code>private static readonly ObservableEventListener _listener = LoggingHelper.GetEventListener();</code></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.Practices.EnterpriseLibrary.SemanticLogging;</span><br><span class="line"><span class="keyword">using</span> Microsoft.ServiceFabric.Services.Runtime;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"><span class="keyword">using</span> System.Threading;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">AcmeService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">internal</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">readonly</span> ObservableEventListener _listener = LoggingHelper.GetEventListener();</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> This is the entry point of the service host process.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span><br><span class="line">        </span>&#123;</span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                ServiceRuntime.RegisterServiceAsync(<span class="string">"LoggingServiceType"</span>,</span><br><span class="line">                    context =&gt; <span class="keyword">new</span> LoggingService(context)).GetAwaiter().GetResult();</span><br><span class="line"></span><br><span class="line">                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, <span class="keyword">typeof</span>(LoggingService).Name);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Prevents this host process from terminating so services keep running.</span></span><br><span class="line">                Thread.Sleep(Timeout.Infinite);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (Exception e)</span><br><span class="line">            &#123;</span><br><span class="line">                ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());</span><br><span class="line">                <span class="keyword">throw</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And that’s about it… how simple is it to get your Service Fabric application events sent to Application Insights! Given the event producer (your Service Fabric application) is decoupled from the target through the magic of ETW and Semantic Logging libraries, the exact same approach and with minimal code changes successfully allows me to target Elastic Search as the event target. In fact for your systems you might also prefer to send some events to Application Insights and others to an Elastic Search cluster. Lastly I would like to conclude by saying if you find any of the above useful in your projects do consider contributing to Fidel’s excellent library or by creating completely new sinks for Semantic Logging!</p>
+<hr>
+<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><ol>
+<li><a href="https://msdn.microsoft.com/en-us/library/dn440729(v=pandp.60).aspx" target="_blank" rel="external">https://msdn.microsoft.com/en-us/library/dn440729(v=pandp.60).aspx</a></li>
+<li><a href="https://msdn.microsoft.com/en-us/library/dn775014(v=pandp.20).aspx" target="_blank" rel="external">https://msdn.microsoft.com/en-us/library/dn775014(v=pandp.20).aspx</a></li>
+<li><a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363668.aspx" target="_blank" rel="external">https://msdn.microsoft.com/en-us/library/windows/desktop/aa363668.aspx</a></li>
+<li><a href="https://github.com/mspnp/semantic-logging" target="_blank" rel="external">https://github.com/mspnp/semantic-logging</a></li>
+<li><a href="https://github.com/fidmor89/SLAB_AppInsights" target="_blank" rel="external">https://github.com/fidmor89/SLAB_AppInsights</a></li>
+</ol>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/07/10/Share-Asp-Net-Core-appsettings-json-with-Service-Fabric-Microservices/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Share Asp.Net Core appsettings.json with Service Fabric Microservices&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
