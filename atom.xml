@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.medic-consulting.com/"/>
-  <updated>2017-02-20T12:44:31.359Z</updated>
+  <updated>2017-02-21T08:13:30.962Z</updated>
   <id>http://www.medic-consulting.com/</id>
   
   <author>
@@ -20,9 +20,9 @@
     <link href="http://www.medic-consulting.com/2017/01/19/Asp-Net-Core-DataProtection-for-Service-Fabric-with-Kestrel-WebListener/"/>
     <id>http://www.medic-consulting.com/2017/01/19/Asp-Net-Core-DataProtection-for-Service-Fabric-with-Kestrel-WebListener/</id>
     <published>2017-01-18T13:13:00.000Z</published>
-    <updated>2017-02-20T12:44:31.359Z</updated>
+    <updated>2017-02-21T08:13:30.962Z</updated>
     
-    <content type="html">&lt;p&gt;In ASP.NET 1.x - 4.x, if you deployed your application to a Web farm, you had to ensure that the configuration files on each server shared the same value for validationKey and decryptionKey, which were used for hashing and decryption respectively. In ASP.NET Core this is accomplished via the data protection stack which was designed to address many of the shortcomings of the old cryptographic stack. The new API provides a simple, easy to use mechanism for data encryption, decryption, key management and rotation. The data protection system ships with several in-box key storage providers; File system, Registry, AzureStorage and Redis. The last two storage providers (AzureStorage and Redis) are meant for multi-server topologies.&lt;/p&gt;
+    <content type="html">&lt;p&gt;In ASP.NET 1.x - 4.x, if you deployed your application to a Web farm, you had to ensure that the configuration files on each server shared the same value for validationKey and decryptionKey, which were used for hashing and decryption respectively. In ASP.NET Core this is accomplished via the data protection stack which was designed to address many of the shortcomings of the old cryptographic stack. The new API provides a simple, easy to use mechanism for data encryption, decryption, key management and rotation. The data protection system ships with several in-box key storage providers; File system, Registry, AzureStorage and Redis. &lt;/p&gt;
 &lt;p&gt;Since we are working with low-latency microservices at massive scale via Azure Service Fabric, in this blog post we’ll describe an approach to create a custom ASP.NET Core data protection key repository using Service Fabric’s built in Reliable Collections, which are Replicated, Persisted, Asynchronous and Transactional. &lt;/p&gt;
 &lt;p&gt;Previous readers will note we’ve covered how to integrate ASP.Net Core and Kestrel into Service Fabric, moreover how to create Service Fabric microservices in the new .Net Core xproj structure (soon to be superseded with VS 2017), therefore we’ll jump straight into building the AspNetCore.DataProtection.ServiceFabric microservice (warning this post is code heavy). To test everything out we’ll create a sample ASP.Net Core Web API microservice and finally for completeness integrate WebListener, a Windows only web server.&lt;/p&gt;
 &lt;p&gt;To begin, we create a new stateful Service Fabric microservice called DataProtectionService: &lt;/p&gt;
@@ -396,31 +396,6 @@
   </entry>
   
   <entry>
-    <title> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour</title>
-    <link href="http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"/>
-    <id>http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/</id>
-    <published>2014-12-14T13:00:00.000Z</published>
-    <updated>2016-03-29T02:30:03.632Z</updated>
-    
-    <content type="html">&lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.&lt;/p&gt;
-&lt;p&gt;According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”&lt;/p&gt;
-&lt;p&gt;Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”&lt;/p&gt;
-&lt;p&gt;For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: &lt;strong&gt;-t272.&lt;/strong&gt; &lt;/p&gt;
-&lt;p&gt;The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. &lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA 
-    
-    </summary>
-    
-    
-      <category term="SQL Server" scheme="http://www.medic-consulting.com/tags/SQL-Server/"/>
-    
-  </entry>
-  
-  <entry>
     <title> Continuous integration &amp; deployment of Azure Web Roles using TFS on-premise and WebDeploy - Part 1</title>
     <link href="http://www.medic-consulting.com/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/"/>
     <id>http://www.medic-consulting.com/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/</id>
@@ -449,6 +424,31 @@
       <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
     
       <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
+    
+  </entry>
+  
+  <entry>
+    <title> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour</title>
+    <link href="http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"/>
+    <id>http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/</id>
+    <published>2014-12-14T13:00:00.000Z</published>
+    <updated>2016-03-29T02:30:03.632Z</updated>
+    
+    <content type="html">&lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.&lt;/p&gt;
+&lt;p&gt;According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”&lt;/p&gt;
+&lt;p&gt;Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”&lt;/p&gt;
+&lt;p&gt;For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: &lt;strong&gt;-t272.&lt;/strong&gt; &lt;/p&gt;
+&lt;p&gt;The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. &lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA 
+    
+    </summary>
+    
+    
+      <category term="SQL Server" scheme="http://www.medic-consulting.com/tags/SQL-Server/"/>
     
   </entry>
   

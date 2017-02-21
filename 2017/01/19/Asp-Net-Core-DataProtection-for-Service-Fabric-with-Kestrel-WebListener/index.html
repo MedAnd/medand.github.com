@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Medic Consulting">
 <meta property="og:description" content="In ASP.NET 1.x - 4.x, if you deployed your application to a Web farm, you had to ensure that the configuration files on each server shared the same value for validationKey and decryptionKey, which wer">
 <meta property="og:image" content="http://www.medic-consulting.com/images/007_AspNetCoreDataProtectionServiceFabricSwaggerAPI.jpg">
-<meta property="og:updated_time" content="2017-02-20T12:44:31.359Z">
+<meta property="og:updated_time" content="2017-02-21T08:13:30.962Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET Core DataProtection for Service Fabric with Kestrel & WebListener">
 <meta name="twitter:description" content="In ASP.NET 1.x - 4.x, if you deployed your application to a Web farm, you had to ensure that the configuration files on each server shared the same value for validationKey and decryptionKey, which wer">
@@ -94,7 +94,7 @@ ga('send', 'pageview');
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>In ASP.NET 1.x - 4.x, if you deployed your application to a Web farm, you had to ensure that the configuration files on each server shared the same value for validationKey and decryptionKey, which were used for hashing and decryption respectively. In ASP.NET Core this is accomplished via the data protection stack which was designed to address many of the shortcomings of the old cryptographic stack. The new API provides a simple, easy to use mechanism for data encryption, decryption, key management and rotation. The data protection system ships with several in-box key storage providers; File system, Registry, AzureStorage and Redis. The last two storage providers (AzureStorage and Redis) are meant for multi-server topologies.</p>
+        <p>In ASP.NET 1.x - 4.x, if you deployed your application to a Web farm, you had to ensure that the configuration files on each server shared the same value for validationKey and decryptionKey, which were used for hashing and decryption respectively. In ASP.NET Core this is accomplished via the data protection stack which was designed to address many of the shortcomings of the old cryptographic stack. The new API provides a simple, easy to use mechanism for data encryption, decryption, key management and rotation. The data protection system ships with several in-box key storage providers; File system, Registry, AzureStorage and Redis. </p>
 <p>Since we are working with low-latency microservices at massive scale via Azure Service Fabric, in this blog post we’ll describe an approach to create a custom ASP.NET Core data protection key repository using Service Fabric’s built in Reliable Collections, which are Replicated, Persisted, Asynchronous and Transactional. </p>
 <p>Previous readers will note we’ve covered how to integrate ASP.Net Core and Kestrel into Service Fabric, moreover how to create Service Fabric microservices in the new .Net Core xproj structure (soon to be superseded with VS 2017), therefore we’ll jump straight into building the AspNetCore.DataProtection.ServiceFabric microservice (warning this post is code heavy). To test everything out we’ll create a sample ASP.Net Core Web API microservice and finally for completeness integrate WebListener, a Windows only web server.</p>
 <p>To begin, we create a new stateful Service Fabric microservice called DataProtectionService: </p>
