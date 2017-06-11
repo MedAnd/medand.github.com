@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Upgrade your .Net Core Service Fabric Microservices from VS 2015 to VS 2017 - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Service Fabric projects have evolved at what feels like a cracking pace, along with the .Net Core platform and tooling, and with the recent release of Visual Studio 2017 no doubt you are considering t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Upgrade your .Net Core Service Fabric Microservices from VS 2015 to VS 2017">
+<meta property="og:url" content="http://www.medic-consulting.com/2017/06/07/Upgrade-your-Net-Core-Service-Fabric-Microservices-from-VS-2015-to-VS-2017/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="Service Fabric projects have evolved at what feels like a cracking pace, along with the .Net Core platform and tooling, and with the recent release of Visual Studio 2017 no doubt you are considering t">
+<meta property="og:updated_time" content="2017-06-11T03:14:28.197Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Upgrade your .Net Core Service Fabric Microservices from VS 2015 to VS 2017">
+<meta name="twitter:description" content="Service Fabric projects have evolved at what feels like a cracking pace, along with the .Net Core platform and tooling, and with the recent release of Visual Studio 2017 no doubt you are considering t">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a id="social-nav" href="https://www.linkedin.com/profile/view?id=AAEAAADJd3wBQV-OhfBUuu3GZdhCZ8oa_9g462M"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a id="social-nav" href="https://github.com/medand"><i class="fa fa-github" aria-hidden="true"></i></a>
+          <a id="social-nav" href="/atom.xml"><i class="fa fa-rss" aria-hidden="true"></i></a>
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Upgrade-your-Net-Core-Service-Fabric-Microservices-from-VS-2015-to-VS-2017" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Upgrade your .Net Core Service Fabric Microservices from VS 2015 to VS 2017
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2017/06/07/Upgrade-your-Net-Core-Service-Fabric-Microservices-from-VS-2015-to-VS-2017/" class="article-date">
+  <time datetime="2017-06-07T12:56:00.000Z" itemprop="datePublished">2017-06-07</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Service Fabric projects have evolved at what feels like a cracking pace, along with the .Net Core platform and tooling, and with the recent release of Visual Studio 2017 no doubt you are considering the productivity merits of upgrading (container support). For Service Fabric projects designed in Visual Studio 2015 and using the .Net Core .xproj/project.json structures now deprecated in Visual Studio 2017, the automatic upgrade process may result in only partial conversion success.</p>
+<p>In this article we’ll take a look at the issues encountered while upgrading a .Net Core Service Fabric solution containing 77 .xproj/project.json projects to Visual Studio 2017. </p>
+<h3 id="From-Net-Core-Visual-Studio-2015-xproj-project-json-to-Visual-Studio-2017-csproj"><a href="#From-Net-Core-Visual-Studio-2015-xproj-project-json-to-Visual-Studio-2017-csproj" class="headerlink" title="From .Net Core Visual Studio 2015 .xproj/project.json to Visual Studio 2017 .csproj"></a>From .Net Core Visual Studio 2015 .xproj/project.json to Visual Studio 2017 .csproj</h3><p>To begin, let’s take a look at a simplified example of a stateful .Net Core microservice defined with the following project.json (VS 2015) structure:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"title"</span>: <span class="string">"Acme.Service.Auction"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"Acme.Service.Auction"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0-*"</span>,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"buildOptions"</span>: &#123;</span><br><span class="line">    <span class="attr">"emitEntryPoint"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"preserveCompilationContext"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"compile"</span>: &#123;</span><br><span class="line">      <span class="attr">"exclude"</span>: [</span><br><span class="line">        <span class="string">"PackageRoot"</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric"</span>: <span class="string">"5.1.150"</span>,</span><br><span class="line">    <span class="attr">"Microsoft.ServiceFabric.Services"</span>: <span class="string">"2.1.150"</span>,</span><br><span class="line">    <span class="attr">"EnterpriseLibrary.SemanticLogging"</span>: <span class="string">"2.0.1406.1"</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"frameworks"</span>: &#123;</span><br><span class="line">    <span class="attr">"net46"</span>: &#123;&#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">"runtimes"</span>: &#123;</span><br><span class="line">    <span class="attr">"win7-x64"</span>: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Once the automatic Visual Studio 2017 conversion completes, you’ll end up with a .csproj file similar to the below:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Project</span> <span class="attr">Sdk</span>=<span class="string">"Microsoft.NET.Sdk"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Description</span>&gt;</span>Acme.Service.Auction<span class="tag">&lt;/<span class="name">Description</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">AssemblyTitle</span>&gt;</span>Acme.Service.Auction<span class="tag">&lt;/<span class="name">AssemblyTitle</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">TargetFramework</span>&gt;</span>net46<span class="tag">&lt;/<span class="name">TargetFramework</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">PreserveCompilationContext</span>&gt;</span>true<span class="tag">&lt;/<span class="name">PreserveCompilationContext</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">AssemblyName</span>&gt;</span>Acme.Service.Auction<span class="tag">&lt;/<span class="name">AssemblyName</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">OutputType</span>&gt;</span>Exe<span class="tag">&lt;/<span class="name">OutputType</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">PackageId</span>&gt;</span>Acme.Service.Auction<span class="tag">&lt;/<span class="name">PackageId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">RuntimeIdentifiers</span>&gt;</span>win7-x64<span class="tag">&lt;/<span class="name">RuntimeIdentifiers</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyTitleAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyTitleAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyDescriptionAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyDescriptionAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyConfigurationAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyConfigurationAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyCompanyAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyCompanyAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyProductAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyProductAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyCopyrightAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyCopyrightAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyVersionAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyVersionAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">GenerateAssemblyFileVersionAttribute</span>&gt;</span>false<span class="tag">&lt;/<span class="name">GenerateAssemblyFileVersionAttribute</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">IsServiceFabricServiceProject</span>&gt;</span>True<span class="tag">&lt;/<span class="name">IsServiceFabricServiceProject</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">ItemGroup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Compile</span> <span class="attr">Remove</span>=<span class="string">"PackageRoot\**\*"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ItemGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">ItemGroup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">PackageReference</span> <span class="attr">Include</span>=<span class="string">"Microsoft.ServiceFabric"</span> <span class="attr">Version</span>=<span class="string">"5.1.150"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">PackageReference</span> <span class="attr">Include</span>=<span class="string">"Microsoft.ServiceFabric.Services"</span> <span class="attr">Version</span>=<span class="string">"2.1.150"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">PackageReference</span> <span class="attr">Include</span>=<span class="string">"EnterpriseLibrary.SemanticLogging"</span> <span class="attr">Version</span>=<span class="string">"2.0.1406.1"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ItemGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">ItemGroup</span> <span class="attr">Condition</span>=<span class="string">" '$(TargetFramework)' == 'net46' "</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Reference</span> <span class="attr">Include</span>=<span class="string">"System"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Reference</span> <span class="attr">Include</span>=<span class="string">"Microsoft.CSharp"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ItemGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">Project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="Processor-architecture-mismatch-warnings"><a href="#Processor-architecture-mismatch-warnings" class="headerlink" title="Processor architecture mismatch warnings"></a>Processor architecture mismatch warnings</h3><p>If you compile the above project, in the build output window you may notice processor architecture mismatch warnings, for example:</p>
+<p><code>1&gt;C:\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\Microsoft.Common.CurrentVersion.targets(1964,5): warning MSB3270: There was a mismatch between the processor architecture of the project being built &quot;MSIL&quot; and the processor architecture of the reference &quot;C:\Users\Admin\.nuget\packages\microsoft.servicefabric.services\2.1.150\lib\net45\Microsoft.ServiceFabric.Services.dll&quot;, &quot;AMD64&quot;. This mismatch may cause runtime failures. Please consider changing the targeted processor architecture of your project through the Configuration Manager so as to align the processor architectures between your project and references, or take a dependency on references with a processor architecture that matches the targeted processor architecture of your project.</code></p>
+<p>To fix these and similar processor architecture mismatch warnings, replace:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">RuntimeIdentifiers</span>&gt;</span>win7-x64<span class="tag">&lt;/<span class="name">RuntimeIdentifiers</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>With this (there is no ending s):</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">RuntimeIdentifier</span>&gt;</span>win7-x64<span class="tag">&lt;/<span class="name">RuntimeIdentifier</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="Packaging-and-Publishing…-not-so-fast"><a href="#Packaging-and-Publishing…-not-so-fast" class="headerlink" title="Packaging and Publishing… not so fast!"></a>Packaging and Publishing… not so fast!</h3><p>So the converted microservice now compiles without any warnings, what’s all the fuss about… well if you now attempt to package and publish this microservice to Service Fabric, it fails with a message similar to the below:</p>
+<p><code>C:\AcmeAuctions\packages\Microsoft.VisualStudio.Azure.Fabric.MSBuild.1.6.0\build\Microsoft.VisualStudio.Azure.Fabric.Application.targets(248,5): warning MSB3026: Could not copy &quot;C:\AcmeAuctions\src\Acme.Service.Auction\bin\x64\Debug\net46\win7-x64\Acme.Service.Auction.runtimeconfig.json&quot; to &quot;C:\AcmeAuctions\pkg\Debug\Acme.Service.AuctionPkg\Code&quot;. Beginning retry 1 in 1000ms. Could not find a part of the path &#39;C:\AcmeAuctions\pkg\Debug\Acme.Service.AuctionPkg\Code&#39;.</code></p>
+<p>Cross checking various existing github and stackoverflow issues, the current Service Fabric SDK for VS 2017 and msbuild tooling appear not support .Net Core projects for Actor, Stateful and Stateless services defined with Microsoft.NET.Sdk. To clarify, the tooling supports Stateful and Stateless ASP.Net Core service projects only, however I prefer all projects to be in .Net Core, not just my ASP.Net microservices. Hence I replace this:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Project</span> <span class="attr">Sdk</span>=<span class="string">"Microsoft.NET.Sdk"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>With the below; as I expect the above scenario to be resolved in the near future with a SDK and tooling update. I’ve simply switched to a supported Service Fabric and VS 2017 template scenario which is to define all microservice .csproj files using Microsoft.NET.Sdk.Web:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Project</span> <span class="attr">Sdk</span>=<span class="string">"Microsoft.NET.Sdk.Web"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>With this simple change your Service Fabric microservies will support .Net Core Actor, Stateful and Stateless VS 2017 projects and will package and publish normally. Note that in Visual Studio 2017 the project icon will change to a web project, and you may optionally want to git ignore and exclude launchSettings.json files, however given the non-intrusive workaround I believe it’s well worth it. To remove the launchSettings.json file from your project, modify the ItemGroup to:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ItemGroup</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">Compile</span> <span class="attr">Remove</span>=<span class="string">"PackageRoot\**\*"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">Content</span> <span class="attr">Remove</span>=<span class="string">"Properties\launchSettings.json"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ItemGroup</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h3><p>We’ve looked at some simple changes you can make to your converted and upgraded Service Fabric project files. The changes allow you to write your Actor, Stateful and Stateless services in .Net Core while taking advantage of the great new productivity gains (Azure integration, Docker support etc.) offered by Visual Studio 2017 and Service Fabric!</p>
+<p>In our next article we’ll continue the upgrade journey by walking through a few DevOps limitations encountered while reconfiguring a Service Fabric Visual Studio Team Services CI/CD pipeline.</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-Net-Core/">Asp.Net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/VS-2017/">VS 2017</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/01/19/Asp-Net-Core-DataProtection-for-Service-Fabric-with-Kestrel-WebListener/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ASP.NET Core DataProtection for Service Fabric with Kestrel &amp; WebListener&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
