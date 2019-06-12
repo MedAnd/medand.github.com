@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.medic-consulting.com/"/>
-  <updated>2017-06-11T03:14:28.197Z</updated>
+  <updated>2019-06-12T12:34:56.663Z</updated>
   <id>http://www.medic-consulting.com/</id>
   
   <author>
@@ -16,11 +16,93 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Monitoring Azure Service Fabric Microservices with Azure Monitor</title>
+    <link href="http://www.medic-consulting.com/2019/06/12/Monitoring-Azure-Service-Fabric-Microservices-with-Azure-Monitor/"/>
+    <id>http://www.medic-consulting.com/2019/06/12/Monitoring-Azure-Service-Fabric-Microservices-with-Azure-Monitor/</id>
+    <published>2019-06-12T11:13:00.000Z</published>
+    <updated>2019-06-12T12:34:56.663Z</updated>
+    
+    <content type="html">&lt;p&gt;By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp;amp; unified monitoring to your Azure Service Fabric clusters by integrating with the Azure Monitor service (formerly known as Azure Log Analytics). We’ll also touch upon a few Azure Service Fabric / Azure Monitor best practices from the field. &lt;/p&gt;
+&lt;p&gt;To start off, Azure Monitor provides a single, cost effective &amp;amp; integrated experience for monitoring Azure resources and hybrid environments. It helps with maximizing operational availability, performance &amp;amp; resource utilization of your VMs and containers by collecting, analyzing and acting on both platform and application level telemetry. &lt;/p&gt;
+&lt;p&gt;Data collected by Azure Monitor fits into two groups, metrics and logs:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Metrics:&lt;/strong&gt; are numerical values that describe some aspect of a system at a particular point in time. They are lightweight and capable of supporting near real-time scenarios.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Logs:&lt;/strong&gt; contain different kinds of data organized into records with different sets of properties for each type. Telemetry such as events and traces are stored as logs in addition to performance data so that it can all be combined for analysis.&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;Log-Analytics-agent&quot;&gt;&lt;a href=&quot;#Log-Analytics-agent&quot; class=&quot;headerlink&quot; title=&quot;Log Analytics agent&quot;&gt;&lt;/a&gt;Log Analytics agent&lt;/h3&gt;&lt;p&gt;For advanced Azure Service Fabric monitoring scenarios we’ll forgo the usual recommendation of using the Azure Diagnostics extension (commonly referred to as the Windows Azure Diagnostic (WAD) or Linux Azure Diagnostic (LAD) extension) and instead opt to leverage the more flexible Log Analytics agent. I like to think of the Log Analytics agent as just another microservice which runs on all Service Fabric nodes but first we need to make it part of the Virtual Machine Scale Set (VMSS). &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;The Log Analytics agent was developed for comprehensive management across on-premises physical and virtual machines, containers and VMs hosted in other clouds. The Windows and Linux agents connect to a Log Analytics workspace in Azure Monitor to collect both monitoring solution-based data as well as custom data sources that you configure.&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;Adding-the-Log-Analytics-agent-to-the-Virtual-Machine-Scale-Set-VMSS&quot;&gt;&lt;a href=&quot;#Adding-the-Log-Analytics-agent-to-the-Virtual-Machine-Scale-Set-VMSS&quot; class=&quot;headerlink&quot; title=&quot;Adding the Log Analytics agent to the Virtual Machine Scale Set (VMSS)&quot;&gt;&lt;/a&gt;Adding the Log Analytics agent to the Virtual Machine Scale Set (VMSS)&lt;/h3&gt;&lt;p&gt;I’ve assumed you have an Azure Monitor Log Analytics workspace already set-up, but if you don’t then head over to &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Create a Log Analytics workspace in the Azure portal&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;The easiest way to add the Log Analytics agent to the underlying Service Fabric Virtual Machine Scale Set (VMSS) is to use the Cloud Shell or Azure CLI. The following official documentation from the Azure Service Fabric team does a great job of explaining the process step by step: &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-oms-agent#add-the-agent-extension-via-azure-cli&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Add the agent extension via Azure CLI&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Note that the Log Analytics agent can also be added directly to an Azure Service Fabric cluster Resource Manager template in case of standing-up new clusters, thus configured with Azure Monitor integration from the get-go.&lt;/p&gt;
+&lt;p&gt;For bonus points, if you prefer PowerShell and having tested it, a great community contribution from Nilay Parikh performs the task just as well: &lt;a href=&quot;https://github.com/nilayparikh/AzureScripts/tree/master/Add-OMSAgentVmssExtension&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Add-OMSAgentVmssExtension&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;.\Add-OMSAgentVmssExtension.ps1 -ResourceGroupLocation &amp;quot;location&amp;quot; -ResourceGroupName &amp;quot;yourresourcegroup&amp;quot; -WorkspaceName &amp;quot;omsworkspacename&amp;quot; -VMScaleSetName &amp;quot;scalesetname&amp;quot; -AutoUpgradeMinorVersion&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usual takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.&lt;/p&gt;
+&lt;h3 id=&quot;Azure-Service-Fabric-Performance-Counters&quot;&gt;&lt;a href=&quot;#Azure-Service-Fabric-Performance-Counters&quot; class=&quot;headerlink&quot; title=&quot;Azure Service Fabric Performance Counters&quot;&gt;&lt;/a&gt;Azure Service Fabric Performance Counters&lt;/h3&gt;&lt;p&gt;With the Log Analytics agent successfully running on each Service Fabric node, we are now ready to start collecting metrics and logs. Luckily for us the Log Analytics agent comes with an understated feature, a built in control plane, meaning we can configure at will which metrics and logs we wish to collect, and at what interval via the Azure Portal. &lt;/p&gt;
+&lt;p&gt;To do so, in the Azure portal go to the resource group in which you created the Service Fabric Analytics solution. Select the name of your Analytics Workspace:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Click Advanced Settings.&lt;/li&gt;
+&lt;li&gt;Click Data, then click Windows or Linux Performance Counters.&lt;/li&gt;
+&lt;li&gt;Select from default / custom performance counters.&lt;/li&gt;
+&lt;li&gt;Click Save, then click OK.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Refer to official documentation for a full list of &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-event-generation-perf&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;recommended Azure Service Fabric cluster performance counters&lt;/a&gt;. In addition Service Fabric generates a substantial amount of custom performance counters:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-services-diagnostics&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Stateful Reliable Services counters&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-serviceremoting-diagnostics&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Reliable Service Remoting counters&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-actors-diagnostics&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Reliable Actors counters&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Note:&lt;/strong&gt; The number of stateful service partitions has a direct correlation to the volume of metrics collected per service. For example an increase in partitions from 5 to 25 would yield a similar jump in volume of metrics and cost of Azure Monitor. As a result, carefully consider and tune the interval for collection of high volume Azure Service Fabric custom performance counters.&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;Analytics-amp-diagnostics&quot;&gt;&lt;a href=&quot;#Analytics-amp-diagnostics&quot; class=&quot;headerlink&quot; title=&quot;Analytics &amp;amp; diagnostics&quot;&gt;&lt;/a&gt;Analytics &amp;amp; diagnostics&lt;/h3&gt;&lt;p&gt;Having configured which performance counters the Log Analytics agent collects, within seconds the data is available in the Azure Monitor workspace for alerting, analytics &amp;amp; diagnostic purposes. For example, we can now visualize the number of Reliable Service new write transactions created per second across the cluster. Select the name of your Analytics Workspace:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Click Logs.&lt;/li&gt;
+&lt;li&gt;Execute the below Kusto query &amp;amp; click CHART:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;Perf
+| where ObjectName == &amp;quot;Service Fabric Transactional Replicator&amp;quot; and CounterName == &amp;quot;Begin Txn Operations/sec&amp;quot;
+| summarize TransactionOperationsPerSecond = avg(CounterValue) by bin(TimeGenerated, 1m)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&quot;/images/008_KustoGraph.jpg&quot; alt=&quot;Begin Txn Operations/sec&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h3&gt;&lt;p&gt;In this post, we’ve learned how simple it is to add powerful &amp;amp; unified platform monitoring to your Azure Service Fabric clusters by integrating with the Azure Monitor service. We deployed &amp;amp; configured the Log Analytics agent using the recommended default and custom performance counters, and hopefully highlighted the correlation of stateful service partitions to Azure Monitor cost. Lastly we crafted our very first Log Analytics Kusto query! In future posts we’ll expand our focus to also cover application level telemetry.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&quot;References&quot;&gt;&lt;a href=&quot;#References&quot; class=&quot;headerlink&quot; title=&quot;References&quot;&gt;&lt;/a&gt;References&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-oms-agent&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-oms-agent&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/nilayparikh/AzureScripts/tree/master/Add-OMSAgentVmssExtension&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/nilayparikh/AzureScripts/tree/master/Add-OMSAgentVmssExtension&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-event-generation-perf&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-event-generation-perf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-services-diagnostics&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-services-diagnostics&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-serviceremoting-diagnostics&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-serviceremoting-diagnostics&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-actors-diagnostics&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-actors-diagnostics&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this po
+    
+    </summary>
+    
+    
+      <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
+    
+      <category term="Azure Monitor" scheme="http://www.medic-consulting.com/tags/Azure-Monitor/"/>
+    
+      <category term="Log Analytics" scheme="http://www.medic-consulting.com/tags/Log-Analytics/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Upgrade your .Net Core Service Fabric Microservices from VS 2015 to VS 2017</title>
     <link href="http://www.medic-consulting.com/2017/06/07/Upgrade-your-Net-Core-Service-Fabric-Microservices-from-VS-2015-to-VS-2017/"/>
     <id>http://www.medic-consulting.com/2017/06/07/Upgrade-your-Net-Core-Service-Fabric-Microservices-from-VS-2015-to-VS-2017/</id>
     <published>2017-06-07T12:56:00.000Z</published>
-    <updated>2017-06-11T03:14:28.197Z</updated>
+    <updated>2017-06-11T03:14:28.198Z</updated>
     
     <content type="html">&lt;p&gt;Service Fabric projects have evolved at what feels like a cracking pace, along with the .Net Core platform and tooling, and with the recent release of Visual Studio 2017 no doubt you are considering the productivity merits of upgrading (container support). For Service Fabric projects designed in Visual Studio 2015 and using the .Net Core .xproj/project.json structures now deprecated in Visual Studio 2017, the automatic upgrade process may result in only partial conversion success.&lt;/p&gt;
 &lt;p&gt;In this article we’ll take a look at the issues encountered while upgrading a .Net Core Service Fabric solution containing 77 .xproj/project.json projects to Visual Studio 2017. &lt;/p&gt;
@@ -123,7 +205,7 @@
     <link href="http://www.medic-consulting.com/2016/08/12/Application-Insights-and-Semantic-Logging-for-Service-Fabric-Microservices/"/>
     <id>http://www.medic-consulting.com/2016/08/12/Application-Insights-and-Semantic-Logging-for-Service-Fabric-Microservices/</id>
     <published>2016-08-12T12:01:00.000Z</published>
-    <updated>2017-02-20T12:39:04.128Z</updated>
+    <updated>2017-02-20T12:39:04.129Z</updated>
     
     <content type="html">&lt;p&gt;Borrowing heavily from MSDN documentation, the term semantic logging refers specifically to the use of strongly typed events and consistent structure of log messages. In Service Fabric sematic logging is baked right into the platform and tooling. For example if we look at any auto generated .cs file for an actor, stateful or stateless service we see examples of logging via the ServiceEventSource or ActorEventSource classes:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(AcmeService).Name);&lt;/code&gt;&lt;/p&gt;
@@ -180,7 +262,7 @@
     <link href="http://www.medic-consulting.com/2016/07/10/Share-Asp-Net-Core-appsettings-json-with-Service-Fabric-Microservices/"/>
     <id>http://www.medic-consulting.com/2016/07/10/Share-Asp-Net-Core-appsettings-json-with-Service-Fabric-Microservices/</id>
     <published>2016-07-10T12:19:00.000Z</published>
-    <updated>2016-07-10T05:24:29.411Z</updated>
+    <updated>2016-07-10T05:24:29.412Z</updated>
     
     <content type="html">&lt;p&gt;If you’ve been working with Service Fabric you would have most likely come across the need to store configuration variables somewhere. This usually means defining and overriding parameters in the following files across various projects:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;ApplicationPackageRoot\ApplicationManifest.xml&lt;/code&gt;&lt;br&gt;&lt;code&gt;ApplicationParameters\Local.xml&lt;/code&gt;&lt;br&gt;&lt;code&gt;PackageRoot\Config\Settings.xml&lt;/code&gt;&lt;/p&gt;
@@ -219,7 +301,7 @@
     <link href="http://www.medic-consulting.com/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/"/>
     <id>http://www.medic-consulting.com/2016/07/06/Create-or-convert-your-Service-Fabric-Microservices-to-Net-Core-xproj-structure/</id>
     <published>2016-07-06T12:29:00.000Z</published>
-    <updated>2016-07-06T13:50:48.694Z</updated>
+    <updated>2016-07-06T13:50:48.695Z</updated>
     
     <content type="html">&lt;p&gt;In a previous article we walked through the process of hosting our Asp.Net Core Web Microservice within Service Fabric and also self-hosting outside Service Fabric via Kestrel for development and debugging. Today we’ll discuss how we can create a new .Net Core Service Fabric Microservice targeting the full stack (.net46), given the VS 2015 template only supports web projects currently. Note that similar principles would apply to converting existing Microservice projects to .Net Core xproj structure.&lt;/p&gt;
 &lt;p&gt;To begin, in Visual Studio 2015 add a new Service Fabric Project, in my example a Stateful Service named AcmeService:&lt;/p&gt;
@@ -300,7 +382,7 @@
     <link href="http://www.medic-consulting.com/2016/06/23/Deploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/"/>
     <id>http://www.medic-consulting.com/2016/06/23/Deploy-a-Service-Fabric-Cluster-with-support-for-net-4-6/</id>
     <published>2016-06-23T13:13:00.000Z</published>
-    <updated>2016-06-26T11:41:14.450Z</updated>
+    <updated>2016-06-26T11:41:14.451Z</updated>
     
     <content type="html">&lt;p&gt;For anyone working with Service Fabric and wishing to build a solution targeting the .NET Framework 4.6, deploying to Azure is a challenge given this version of the framework is not yet available in the default Windows Server 2012 image. &lt;/p&gt;
 &lt;p&gt;To overcome the above limitation and to make the process as easy as possible, we’ll employ a customised Azure Resource Manager (ARM) template which we’ll first generate via the Azure Portal.  To get started simply click on the following link &lt;a href=&quot;https://portal.azure.com/#create/Microsoft.ServiceFabricCluster&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://portal.azure.com/#create/Microsoft.ServiceFabricCluster&lt;/a&gt; or in Azure Marketplace search for Service Fabric Cluster.&lt;/p&gt;
@@ -339,7 +421,7 @@
     <link href="http://www.medic-consulting.com/2016/06/14/Asp-Net-Core-MVC-6-OpenIdConnect-JWT-and-Angular-2-SPA-Part-2/"/>
     <id>http://www.medic-consulting.com/2016/06/14/Asp-Net-Core-MVC-6-OpenIdConnect-JWT-and-Angular-2-SPA-Part-2/</id>
     <published>2016-06-13T15:52:00.000Z</published>
-    <updated>2016-06-21T10:05:47.147Z</updated>
+    <updated>2016-06-21T10:05:47.148Z</updated>
     
     <content type="html">&lt;p&gt;Continuing on from a previous post this article details my journey in upgrading a Service Fabric multi-tenant application from .Net Core RC1 to RC2, which turned out to be a breaking albeit worthwhile change, specifically for the Startup.cs class and related boot strapping code for Swagger, CookieAuthentication, OpenIdConnectAuthentication and JwtBearerAuthentication. In subsequent posts we’ll explore how .Net Core RC2 hosts web applications but for now let’s look at the first challenge encountered during the upgrade, which was to chase down all required libraries that are also .Net Core RC2 compatible.&lt;/p&gt;
 &lt;blockquote&gt;&lt;p&gt;As of the time of writing, I could only get Swashbuckle version 6.0.0-beta9 to work with .Net Core RC2. &lt;/p&gt;
@@ -378,7 +460,7 @@
     <link href="http://www.medic-consulting.com/2016/06/04/Visual-Studio-Online-Powershell-steps-snippets/"/>
     <id>http://www.medic-consulting.com/2016/06/04/Visual-Studio-Online-Powershell-steps-snippets/</id>
     <published>2016-06-03T14:00:00.000Z</published>
-    <updated>2016-06-04T12:59:35.951Z</updated>
+    <updated>2016-06-04T12:59:35.952Z</updated>
     
     <content type="html">&lt;p&gt;Visual Studio Online build definitions &amp;amp; tasks have certainly come a long way since the old xaml template days. There is even a &lt;a href=&quot;https://marketplace.visualstudio.com/vsts/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;VSO extensions&lt;/a&gt; market place. For my current project we are using good old PowerShell based tasks which work together to continuously deploy the solution from VSO to a single node Azure VM Service Fabric cluster which runs all unit, integration and automated UI tests. Some PowerShell snippets which I’ve found helpful along the way are detailed below.&lt;/p&gt;
 &lt;p&gt;The following task snippet is used to check that a Service Fabric hosted Web endpoint is reachable and ready for integration and UI testing:&lt;/p&gt;
@@ -412,7 +494,7 @@
     <link href="http://www.medic-consulting.com/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/"/>
     <id>http://www.medic-consulting.com/2016/03/29/Asp-Net-Core-bug-within-AuthenticationFailed-middleware-on-redirect/</id>
     <published>2016-03-28T13:00:00.000Z</published>
-    <updated>2016-06-19T12:44:28.889Z</updated>
+    <updated>2016-06-19T12:44:28.890Z</updated>
     
     <content type="html">&lt;p&gt;Working with Asp.Net Core and Angular 2 at the time of writing may feel like a trail blazing experience, especially given the lack of documentation and stability in the underling frameworks, libraries and tools, leading to lost time in debugging and searching for answers. &lt;/p&gt;
 &lt;p&gt;In the hope of documenting some of my own recent experiences integrating these technologies and Microsoft’s micro-services framework &lt;a href=&quot;https://azure.microsoft.com/en-us/services/service-fabric/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Service Fabric&lt;/a&gt;, I’ll dive into specific code areas which have proven fiddley. To start off I should preface that the version of Asp.Net Core I’m currently targeting is RC1 and some bugs and workarounds will not apply to subsequent framework versions. Moreover the Service Fabric version targeted is Service Fabric SDK (version 2.0.217) and Service Fabric Runtime (version 5.0.217).&lt;/p&gt;
@@ -446,7 +528,7 @@
     <link href="http://www.medic-consulting.com/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/"/>
     <id>http://www.medic-consulting.com/2014/12/15/Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1/</id>
     <published>2014-12-14T13:00:00.000Z</published>
-    <updated>2016-06-04T14:59:28.637Z</updated>
+    <updated>2016-06-04T14:59:28.638Z</updated>
     
     <content type="html">&lt;p&gt;Much work has gone into making continuous integration &amp;amp; deployment of Azure Websites as simple and low friction as possible with support for Visual Studio Online, Git and BitBucket etc. For customers and teams still using TFS on-premise and working with Web Roles (Azure Cloud Services) the experience is a little more involved with many resorting to rolling their own solutions, TFS Build Templates and PowerShell scripts, if tools like Octopus Deploy and platforms like appveyor are beyond reach.&lt;/p&gt;
 &lt;blockquote&gt;&lt;p&gt;Before we proceed a small caveat, in part one we’ll look at automating just the deployment of files and code which have changed. This should suffice for most single instance Dev and Test scenarios, where code is compiled and deployed on hourly, daily cycles. For Production you will also want to deploy the .cspkg file in case Azure reprovisions your Web Role instance(s).&lt;/p&gt;
@@ -478,7 +560,7 @@
     <link href="http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"/>
     <id>http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/</id>
     <published>2014-12-14T13:00:00.000Z</published>
-    <updated>2016-03-29T02:30:03.632Z</updated>
+    <updated>2016-03-29T02:30:03.633Z</updated>
     
     <content type="html">&lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.&lt;/p&gt;
 &lt;p&gt;According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”&lt;/p&gt;
@@ -503,7 +585,7 @@
     <link href="http://www.medic-consulting.com/2014/11/15/Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage/"/>
     <id>http://www.medic-consulting.com/2014/11/15/Uploading-an-Image-in-MVC-5-to-Azure-Blob-Storage/</id>
     <published>2014-11-14T13:00:00.000Z</published>
-    <updated>2016-03-29T02:27:25.464Z</updated>
+    <updated>2016-03-29T02:27:25.465Z</updated>
     
     <content type="html">&lt;p&gt;An interesting customer requirement last week came up where I needed to upload an image in MVC 5 directly to Azure Blob Storage. A simplified version follows, removing some application specific logic and validation steps. To start off I first created a MVC model for image upload purposes.&lt;/p&gt;
 &lt;p&gt;ImageUploadBindingModel&lt;/p&gt;
@@ -536,7 +618,7 @@
     <link href="http://www.medic-consulting.com/2014/10/31/Extending-Asp-Net-Identity-2-0-with-custom-fields/"/>
     <id>http://www.medic-consulting.com/2014/10/31/Extending-Asp-Net-Identity-2-0-with-custom-fields/</id>
     <published>2014-10-30T13:00:00.000Z</published>
-    <updated>2016-03-29T02:04:29.279Z</updated>
+    <updated>2016-03-29T02:04:29.280Z</updated>
     
     <content type="html">&lt;p&gt;Recently I needed a quick and low friction way of extending Asp.Net Identity 2.0, tying into the Entity Framework 6 way of working with custom fields and table mappings. To accomplish this first create something similar to a new ContosoIdentityUser which inherits from IdentityUser.&lt;/p&gt;
 &lt;p&gt;ContosoIdentityUser.cs&lt;/p&gt;

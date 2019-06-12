@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Monitoring Azure Service Fabric Microservices with Azure Monitor - Medic Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp;amp; unifie">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Monitoring Azure Service Fabric Microservices with Azure Monitor">
+<meta property="og:url" content="http://www.medic-consulting.com/2019/06/12/Monitoring-Azure-Service-Fabric-Microservices-with-Azure-Monitor/index.html">
+<meta property="og:site_name" content="Medic Consulting">
+<meta property="og:description" content="By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp;amp; unifie">
+<meta property="og:image" content="http://www.medic-consulting.com/images/008_KustoGraph.jpg">
+<meta property="og:updated_time" content="2019-06-12T12:34:56.663Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Monitoring Azure Service Fabric Microservices with Azure Monitor">
+<meta name="twitter:description" content="By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp;amp; unifie">
+<meta name="twitter:image" content="http://www.medic-consulting.com/images/008_KustoGraph.jpg">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-56342083-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a id="social-nav" href="https://www.linkedin.com/profile/view?id=AAEAAADJd3wBQV-OhfBUuu3GZdhCZ8oa_9g462M"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+          <a id="social-nav" href="https://github.com/medand"><i class="fa fa-github" aria-hidden="true"></i></a>
+          <a id="social-nav" href="/atom.xml"><i class="fa fa-rss" aria-hidden="true"></i></a>
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.medic-consulting.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Monitoring-Azure-Service-Fabric-Microservices-with-Azure-Monitor" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Monitoring Azure Service Fabric Microservices with Azure Monitor
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2019/06/12/Monitoring-Azure-Service-Fabric-Microservices-with-Azure-Monitor/" class="article-date">
+  <time datetime="2019-06-12T11:13:00.000Z" itemprop="datePublished">2019-06-12</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp; unified monitoring to your Azure Service Fabric clusters by integrating with the Azure Monitor service (formerly known as Azure Log Analytics). We’ll also touch upon a few Azure Service Fabric / Azure Monitor best practices from the field. </p>
+<p>To start off, Azure Monitor provides a single, cost effective &amp; integrated experience for monitoring Azure resources and hybrid environments. It helps with maximizing operational availability, performance &amp; resource utilization of your VMs and containers by collecting, analyzing and acting on both platform and application level telemetry. </p>
+<p>Data collected by Azure Monitor fits into two groups, metrics and logs:</p>
+<blockquote>
+<p><em><strong>Metrics:</strong> are numerical values that describe some aspect of a system at a particular point in time. They are lightweight and capable of supporting near real-time scenarios.</em></p>
+<p><em><strong>Logs:</strong> contain different kinds of data organized into records with different sets of properties for each type. Telemetry such as events and traces are stored as logs in addition to performance data so that it can all be combined for analysis.</em></p>
+</blockquote>
+<h3 id="Log-Analytics-agent"><a href="#Log-Analytics-agent" class="headerlink" title="Log Analytics agent"></a>Log Analytics agent</h3><p>For advanced Azure Service Fabric monitoring scenarios we’ll forgo the usual recommendation of using the Azure Diagnostics extension (commonly referred to as the Windows Azure Diagnostic (WAD) or Linux Azure Diagnostic (LAD) extension) and instead opt to leverage the more flexible Log Analytics agent. I like to think of the Log Analytics agent as just another microservice which runs on all Service Fabric nodes but first we need to make it part of the Virtual Machine Scale Set (VMSS). </p>
+<blockquote>
+<p><em>The Log Analytics agent was developed for comprehensive management across on-premises physical and virtual machines, containers and VMs hosted in other clouds. The Windows and Linux agents connect to a Log Analytics workspace in Azure Monitor to collect both monitoring solution-based data as well as custom data sources that you configure.</em></p>
+</blockquote>
+<h3 id="Adding-the-Log-Analytics-agent-to-the-Virtual-Machine-Scale-Set-VMSS"><a href="#Adding-the-Log-Analytics-agent-to-the-Virtual-Machine-Scale-Set-VMSS" class="headerlink" title="Adding the Log Analytics agent to the Virtual Machine Scale Set (VMSS)"></a>Adding the Log Analytics agent to the Virtual Machine Scale Set (VMSS)</h3><p>I’ve assumed you have an Azure Monitor Log Analytics workspace already set-up, but if you don’t then head over to <a href="https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace" target="_blank" rel="external">Create a Log Analytics workspace in the Azure portal</a>. </p>
+<p>The easiest way to add the Log Analytics agent to the underlying Service Fabric Virtual Machine Scale Set (VMSS) is to use the Cloud Shell or Azure CLI. The following official documentation from the Azure Service Fabric team does a great job of explaining the process step by step: <a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-oms-agent#add-the-agent-extension-via-azure-cli" target="_blank" rel="external">Add the agent extension via Azure CLI</a>.</p>
+<p>Note that the Log Analytics agent can also be added directly to an Azure Service Fabric cluster Resource Manager template in case of standing-up new clusters, thus configured with Azure Monitor integration from the get-go.</p>
+<p>For bonus points, if you prefer PowerShell and having tested it, a great community contribution from Nilay Parikh performs the task just as well: <a href="https://github.com/nilayparikh/AzureScripts/tree/master/Add-OMSAgentVmssExtension" target="_blank" rel="external">Add-OMSAgentVmssExtension</a>:</p>
+<blockquote>
+<p><code>.\Add-OMSAgentVmssExtension.ps1 -ResourceGroupLocation &quot;location&quot; -ResourceGroupName &quot;yourresourcegroup&quot; -WorkspaceName &quot;omsworkspacename&quot; -VMScaleSetName &quot;scalesetname&quot; -AutoUpgradeMinorVersion</code></p>
+</blockquote>
+<p>Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usual takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.</p>
+<h3 id="Azure-Service-Fabric-Performance-Counters"><a href="#Azure-Service-Fabric-Performance-Counters" class="headerlink" title="Azure Service Fabric Performance Counters"></a>Azure Service Fabric Performance Counters</h3><p>With the Log Analytics agent successfully running on each Service Fabric node, we are now ready to start collecting metrics and logs. Luckily for us the Log Analytics agent comes with an understated feature, a built in control plane, meaning we can configure at will which metrics and logs we wish to collect, and at what interval via the Azure Portal. </p>
+<p>To do so, in the Azure portal go to the resource group in which you created the Service Fabric Analytics solution. Select the name of your Analytics Workspace:</p>
+<ol>
+<li>Click Advanced Settings.</li>
+<li>Click Data, then click Windows or Linux Performance Counters.</li>
+<li>Select from default / custom performance counters.</li>
+<li>Click Save, then click OK.</li>
+</ol>
+<p>Refer to official documentation for a full list of <a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-event-generation-perf" target="_blank" rel="external">recommended Azure Service Fabric cluster performance counters</a>. In addition Service Fabric generates a substantial amount of custom performance counters:</p>
+<ul>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-services-diagnostics" target="_blank" rel="external">Stateful Reliable Services counters</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-serviceremoting-diagnostics" target="_blank" rel="external">Reliable Service Remoting counters</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-actors-diagnostics" target="_blank" rel="external">Reliable Actors counters</a></li>
+</ul>
+<blockquote>
+<p><em><strong>Note:</strong> The number of stateful service partitions has a direct correlation to the volume of metrics collected per service. For example an increase in partitions from 5 to 25 would yield a similar jump in volume of metrics and cost of Azure Monitor. As a result, carefully consider and tune the interval for collection of high volume Azure Service Fabric custom performance counters.</em></p>
+</blockquote>
+<h3 id="Analytics-amp-diagnostics"><a href="#Analytics-amp-diagnostics" class="headerlink" title="Analytics &amp; diagnostics"></a>Analytics &amp; diagnostics</h3><p>Having configured which performance counters the Log Analytics agent collects, within seconds the data is available in the Azure Monitor workspace for alerting, analytics &amp; diagnostic purposes. For example, we can now visualize the number of Reliable Service new write transactions created per second across the cluster. Select the name of your Analytics Workspace:</p>
+<ol>
+<li>Click Logs.</li>
+<li>Execute the below Kusto query &amp; click CHART:</li>
+</ol>
+<blockquote>
+<p><code>Perf
+| where ObjectName == &quot;Service Fabric Transactional Replicator&quot; and CounterName == &quot;Begin Txn Operations/sec&quot;
+| summarize TransactionOperationsPerSecond = avg(CounterValue) by bin(TimeGenerated, 1m)</code></p>
+</blockquote>
+<p><img src="/images/008_KustoGraph.jpg" alt="Begin Txn Operations/sec"></p>
+<h3 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h3><p>In this post, we’ve learned how simple it is to add powerful &amp; unified platform monitoring to your Azure Service Fabric clusters by integrating with the Azure Monitor service. We deployed &amp; configured the Log Analytics agent using the recommended default and custom performance counters, and hopefully highlighted the correlation of stateful service partitions to Azure Monitor cost. Lastly we crafted our very first Log Analytics Kusto query! In future posts we’ll expand our focus to also cover application level telemetry.</p>
+<hr>
+<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><ol>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-oms-agent" target="_blank" rel="external">https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-oms-agent</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace" target="_blank" rel="external">https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace</a></li>
+<li><a href="https://github.com/nilayparikh/AzureScripts/tree/master/Add-OMSAgentVmssExtension" target="_blank" rel="external">https://github.com/nilayparikh/AzureScripts/tree/master/Add-OMSAgentVmssExtension</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-event-generation-perf" target="_blank" rel="external">https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-diagnostics-event-generation-perf</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-services-diagnostics" target="_blank" rel="external">https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-services-diagnostics</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-serviceremoting-diagnostics" target="_blank" rel="external">https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-serviceremoting-diagnostics</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-actors-diagnostics" target="_blank" rel="external">https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-actors-diagnostics</a></li>
+</ol>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Azure-Monitor/">Azure Monitor</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Log-Analytics/">Log Analytics</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Service-Fabric/">Service Fabric</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/06/07/Upgrade-your-Net-Core-Service-Fabric-Microservices-from-VS-2015-to-VS-2017/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Upgrade your .Net Core Service Fabric Microservices from VS 2015 to VS 2017&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Medic Consulting&nbsp;
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
