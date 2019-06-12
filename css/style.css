@@ -560,10 +560,9 @@ a.article-title:hover,
 }
 .article-entry blockquote {
   font-family: 'PT Serif', 'Microsoft Yahei', serif;
-  font-size: 1.2em;
-  font-weight: bold;
+  font-size: 1.0em;
   color: #000;
-  margin: 1.4em 16px;
+  margin: 1.4em 20px;
   text-align: left;
 }
 .article-entry blockquote footer {
