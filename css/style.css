@@ -563,8 +563,8 @@ a.article-title:hover,
   color: #000;
   margin: 1.4em 20px;
   text-align: left;
-  border-left: 0.5em solid #ddd;
-  padding: 0px 1.4em;
+  border-left: 0.3em solid #ddd;
+  padding: 0px 15px;
 }
 .article-entry .pullquote {
   text-align: left;
