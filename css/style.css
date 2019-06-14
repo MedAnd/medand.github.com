@@ -399,6 +399,21 @@ a.article-title:hover,
   border: none;
   float: left;
 }
+#social-nav .fa-twitter {
+  padding: 4px;
+  color: #777;
+  font-size: 25px;
+  top: 15px;
+  padding: 20px;
+  text-align: center;
+  display: inline-block;
+  border: none;
+  float: left;
+}
+#social-nav .fa-twitter:hover {
+  background: none;
+  color: #1da1f2;
+}
 #social-nav .fa-linkedin-square:hover {
   background: none;
   color: #007bb6;
