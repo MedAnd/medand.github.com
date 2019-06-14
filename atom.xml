@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.medic-consulting.com/"/>
-  <updated>2019-06-12T12:34:56.663Z</updated>
+  <updated>2019-06-14T10:36:33.112Z</updated>
   <id>http://www.medic-consulting.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://www.medic-consulting.com/2019/06/12/Monitoring-Azure-Service-Fabric-Microservices-with-Azure-Monitor/"/>
     <id>http://www.medic-consulting.com/2019/06/12/Monitoring-Azure-Service-Fabric-Microservices-with-Azure-Monitor/</id>
     <published>2019-06-12T11:13:00.000Z</published>
-    <updated>2019-06-12T12:34:56.663Z</updated>
+    <updated>2019-06-14T10:36:33.112Z</updated>
     
     <content type="html">&lt;p&gt;By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp;amp; unified monitoring to your Azure Service Fabric clusters by integrating with the Azure Monitor service (formerly known as Azure Log Analytics). We’ll also touch upon a few Azure Service Fabric / Azure Monitor best practices from the field. &lt;/p&gt;
 &lt;p&gt;To start off, Azure Monitor provides a single, cost effective &amp;amp; integrated experience for monitoring Azure resources and hybrid environments. It helps with maximizing operational availability, performance &amp;amp; resource utilization of your VMs and containers by collecting, analyzing and acting on both platform and application level telemetry. &lt;/p&gt;
@@ -40,7 +40,7 @@
 &lt;blockquote&gt;
 &lt;p&gt;&lt;code&gt;.\Add-OMSAgentVmssExtension.ps1 -ResourceGroupLocation &amp;quot;location&amp;quot; -ResourceGroupName &amp;quot;yourresourcegroup&amp;quot; -WorkspaceName &amp;quot;omsworkspacename&amp;quot; -VMScaleSetName &amp;quot;scalesetname&amp;quot; -AutoUpgradeMinorVersion&lt;/code&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usual takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.&lt;/p&gt;
+&lt;p&gt;Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usually takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.&lt;/p&gt;
 &lt;h3 id=&quot;Azure-Service-Fabric-Performance-Counters&quot;&gt;&lt;a href=&quot;#Azure-Service-Fabric-Performance-Counters&quot; class=&quot;headerlink&quot; title=&quot;Azure Service Fabric Performance Counters&quot;&gt;&lt;/a&gt;Azure Service Fabric Performance Counters&lt;/h3&gt;&lt;p&gt;With the Log Analytics agent successfully running on each Service Fabric node, we are now ready to start collecting metrics and logs. Luckily for us the Log Analytics agent comes with an understated feature, a built in control plane, meaning we can configure at will which metrics and logs we wish to collect, and at what interval via the Azure Portal. &lt;/p&gt;
 &lt;p&gt;To do so, in the Azure portal go to the resource group in which you created the Service Fabric Analytics solution. Select the name of your Analytics Workspace:&lt;/p&gt;
 &lt;ol&gt;
@@ -194,9 +194,9 @@
     
       <category term="Asp.Net Core" scheme="http://www.medic-consulting.com/tags/Asp-Net-Core/"/>
     
-      <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
-    
       <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
+    
+      <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
     
   </entry>
   
@@ -449,9 +449,9 @@
     
       <category term="Asp.Net Core" scheme="http://www.medic-consulting.com/tags/Asp-Net-Core/"/>
     
-      <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
-    
       <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
+    
+      <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
     
   </entry>
   
@@ -517,9 +517,34 @@
     
       <category term="Asp.Net Core" scheme="http://www.medic-consulting.com/tags/Asp-Net-Core/"/>
     
+      <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
+    
       <category term="Service Fabric" scheme="http://www.medic-consulting.com/tags/Service-Fabric/"/>
     
-      <category term="Security" scheme="http://www.medic-consulting.com/tags/Security/"/>
+  </entry>
+  
+  <entry>
+    <title> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour</title>
+    <link href="http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"/>
+    <id>http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/</id>
+    <published>2014-12-14T13:00:00.000Z</published>
+    <updated>2016-03-29T02:30:03.633Z</updated>
+    
+    <content type="html">&lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.&lt;/p&gt;
+&lt;p&gt;According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”&lt;/p&gt;
+&lt;p&gt;Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”&lt;/p&gt;
+&lt;p&gt;For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: &lt;strong&gt;-t272.&lt;/strong&gt; &lt;/p&gt;
+&lt;p&gt;The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. &lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA 
+    
+    </summary>
+    
+    
+      <category term="SQL Server" scheme="http://www.medic-consulting.com/tags/SQL-Server/"/>
     
   </entry>
   
@@ -552,31 +577,6 @@
       <category term="Azure" scheme="http://www.medic-consulting.com/tags/Azure/"/>
     
       <category term="DevOps" scheme="http://www.medic-consulting.com/tags/DevOps/"/>
-    
-  </entry>
-  
-  <entry>
-    <title> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour</title>
-    <link href="http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"/>
-    <id>http://www.medic-consulting.com/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/</id>
-    <published>2014-12-14T13:00:00.000Z</published>
-    <updated>2016-03-29T02:30:03.633Z</updated>
-    
-    <content type="html">&lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.&lt;/p&gt;
-&lt;p&gt;According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”&lt;/p&gt;
-&lt;p&gt;Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”&lt;/p&gt;
-&lt;p&gt;For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: &lt;strong&gt;-t272.&lt;/strong&gt; &lt;/p&gt;
-&lt;p&gt;The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. &lt;/p&gt;
-</content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA 
-    
-    </summary>
-    
-    
-      <category term="SQL Server" scheme="http://www.medic-consulting.com/tags/SQL-Server/"/>
     
   </entry>
   

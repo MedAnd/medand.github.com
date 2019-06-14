@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Medic Consulting">
 <meta property="og:description" content="By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp;amp; unifie">
 <meta property="og:image" content="http://www.medic-consulting.com/images/008_KustoGraph.jpg">
-<meta property="og:updated_time" content="2019-06-12T12:34:56.663Z">
+<meta property="og:updated_time" content="2019-06-14T10:36:33.112Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Monitoring Azure Service Fabric Microservices with Azure Monitor">
 <meta name="twitter:description" content="By their very nature distributed platforms, applications and services running in the cloud are comprised of many moving parts. In this post we’ll see just how simple it is to add powerful &amp;amp; unifie">
@@ -112,7 +112,7 @@ ga('send', 'pageview');
 <blockquote>
 <p><code>.\Add-OMSAgentVmssExtension.ps1 -ResourceGroupLocation &quot;location&quot; -ResourceGroupName &quot;yourresourcegroup&quot; -WorkspaceName &quot;omsworkspacename&quot; -VMScaleSetName &quot;scalesetname&quot; -AutoUpgradeMinorVersion</code></p>
 </blockquote>
-<p>Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usual takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.</p>
+<p>Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usually takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.</p>
 <h3 id="Azure-Service-Fabric-Performance-Counters"><a href="#Azure-Service-Fabric-Performance-Counters" class="headerlink" title="Azure Service Fabric Performance Counters"></a>Azure Service Fabric Performance Counters</h3><p>With the Log Analytics agent successfully running on each Service Fabric node, we are now ready to start collecting metrics and logs. Luckily for us the Log Analytics agent comes with an understated feature, a built in control plane, meaning we can configure at will which metrics and logs we wish to collect, and at what interval via the Azure Portal. </p>
 <p>To do so, in the Azure portal go to the resource group in which you created the Service Fabric Analytics solution. Select the name of your Analytics Workspace:</p>
 <ol>

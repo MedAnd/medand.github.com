@@ -110,7 +110,7 @@ ga('send', 'pageview');
 <blockquote>
 <p><code>.\Add-OMSAgentVmssExtension.ps1 -ResourceGroupLocation &quot;location&quot; -ResourceGroupName &quot;yourresourcegroup&quot; -WorkspaceName &quot;omsworkspacename&quot; -VMScaleSetName &quot;scalesetname&quot; -AutoUpgradeMinorVersion</code></p>
 </blockquote>
-<p>Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usual takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.</p>
+<p>Following the above steps, the Log Analytics agent is now part of your Service Fabric Virtual Machine Scale Set (VMSS), with any running nodes upgraded, a process that usually takes 20 minutes. Note that the upgrade is performed in a rolling manner, and if your durability level supports it, with zero downtime to your application. Any new nodes created as a result of cluster scaling operations will likewise have the Log Analytics agent automatically deployed.</p>
 <h3 id="Azure-Service-Fabric-Performance-Counters"><a href="#Azure-Service-Fabric-Performance-Counters" class="headerlink" title="Azure Service Fabric Performance Counters"></a>Azure Service Fabric Performance Counters</h3><p>With the Log Analytics agent successfully running on each Service Fabric node, we are now ready to start collecting metrics and logs. Luckily for us the Log Analytics agent comes with an understated feature, a built in control plane, meaning we can configure at will which metrics and logs we wish to collect, and at what interval via the Azure Portal. </p>
 <p>To do so, in the Azure portal go to the resource group in which you created the Service Fabric Analytics solution. Select the name of your Analytics Workspace:</p>
 <ol>
@@ -759,6 +759,51 @@ ga('send', 'pageview');
 
 
     
+      <article id="post-SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/" class="article-date">
+  <time datetime="2014-12-14T13:00:00.000Z" itemprop="datePublished">2014-12-15</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.</p>
+<p>According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”</p>
+<p>Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”</p>
+<p>For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: <strong>-t272.</strong> </p>
+<p>The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. </p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL-Server/">SQL Server</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-Continuous-integration-deployment-of-Azure-Web-Roles-using-TFS-on-premise-and-WebDeploy-Part-1" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -800,51 +845,6 @@ ga('send', 'pageview');
       <footer class="article-footer">
         
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Azure/">Azure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DevOps/">DevOps</a></li></ul>
-
-      </footer>
-    
-  </div>
-  
-</article>
-
-
-    
-      <article id="post-SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/"> SQL Server 2014 Availability Groups, Failover &amp; Identity column behaviour</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      <a href="/2014/12/15/SQL-Server-2014-Availability-Groups-Failover-Identity-column-behaviour/" class="article-date">
-  <time datetime="2014-12-14T13:00:00.000Z" itemprop="datePublished">2014-12-15</time>
-</a>
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Many of us have been using SQL Server’s built-in Identity value feature for as long as we can remember but when running SQL Server in HA scenarios such as AlwaysOn Availability Groups, there are a couple of things to take into consideration.</p>
-<p>According to MSDN documentation “Consecutive values after server restart or other failures – SQL Server might cache identity values for performance reasons and some of the assigned values can be lost during a database failure or server restart. This can result in gaps in the identity value upon insert. If gaps are not acceptable then the application should use its own mechanism to generate key values. Using a sequence generator with the NOCACHE option can limit the gaps to transactions that are never committed.”</p>
-<p>Moreover we read elsewhere “when a table with less than 1000 rows that has an identity value is part of a database that is failed over in an AlwaysOn availability group, the identity is reseeded to 1000. If the identity value is already over 1000, no reseed occurs. This also occurs if you restart the server.”</p>
-<p>For existing Applications using Sequence might not be an option. In this case a scarcely documented workaround might be to set a Start-up Parameter on the SQL Server Service: <strong>-t272.</strong> </p>
-<p>The lowercase “t” is an internal trace flag that is used by SQL Server support engineers. </p>
-
-      
-    </div>
-    
-    
-      <footer class="article-footer">
-        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL-Server/">SQL Server</a></li></ul>
 
       </footer>
     
